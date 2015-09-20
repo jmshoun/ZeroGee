@@ -1,0 +1,4 @@
+# Don't track compiled python
+__pycache__/
+# Don't track fonts
+fonts/
