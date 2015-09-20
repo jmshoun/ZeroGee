@@ -14,7 +14,11 @@ pygame.display.set_caption('ZeroGee')
 clock = pygame.time.Clock()
 level = Level.Level(screen)
 
-while not level.ship.finished:
+def check_for_termination():
+    pressed_keys = pygame.key.get_pressed()
+    return pressed_keys[pygame.K_ESCAPE]
+
+while not check_for_termination():
     pygame.event.get()
     
     level.update()

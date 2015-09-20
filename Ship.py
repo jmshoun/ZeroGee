@@ -35,7 +35,6 @@ class Ship:
 		
 		self.velocity_angular = 0
 		self.position_angular = position_angular
-		self.finished = False
 	
 	def status(self):
 		speed = math.sqrt(self.velocity_x ** 2 + self.velocity_y ** 2) * config.METERS_PER_PIXEL
@@ -81,8 +80,6 @@ class Ship:
 			self.velocity_y -= acceleration * math.cos(self.position_angular)
 			self.velocity_x -= acceleration * math.sin(self.position_angular)
 			self.fuel_mass -= self.THRUST_FUEL_RATE * config.TICK_SIZE
-		if pressed_keys[pygame.K_ESCAPE]:
-			self.finished = True
 		
 		return
 	
