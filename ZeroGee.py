@@ -4,6 +4,7 @@ import pygame
 from pygame.locals import *
 
 import Level
+import config
 
 pygame.init()
 pygame.font.init()
@@ -20,4 +21,4 @@ while not level.ship.finished:
     level.draw()
     
     pygame.display.flip()
-    clock.tick(50)
+    clock.tick(1 / config.TICK_SIZE)
