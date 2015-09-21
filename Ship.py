@@ -38,7 +38,7 @@ class Ship:
 	
 	def status(self):
 		speed = math.sqrt(self.velocity_x ** 2 + self.velocity_y ** 2) * config.METERS_PER_PIXEL
-		return speed
+		return (speed, self.fuel_mass)
 	
 	def camera_position(self):
 		absolute_offset_x = abs(self.velocity_x) ** .6 * .5
