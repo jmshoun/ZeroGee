@@ -13,7 +13,6 @@ STATUS_NEXT = 1
 STATUS_OTHER = 2
 
 class Gate:
-    
     def __init__(self, screen, position, angular_position, status):
         self.screen = screen
         

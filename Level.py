@@ -5,6 +5,7 @@ import pygame
 import Ship
 import HUD
 import Gate
+import FinishBox
 
 class Level:
     def __init__(self, screen):
@@ -15,9 +16,14 @@ class Level:
         self.ship = Ship.Ship(screen, (-0.1, 0), -90)
         self.hud = HUD.HUD(screen)
         self.gates = [Gate.Gate(screen, (0, 0), 90, Gate.STATUS_NEXT),
-                      Gate.Gate(screen, (25, 0), 90, Gate.STATUS_OTHER)]
+                      Gate.Gate(screen, (50, 0), 90, Gate.STATUS_OTHER),
+                      Gate.Gate(screen, (100, 0), 90, Gate.STATUS_OTHER),
+                      Gate.Gate(screen, (150, 0), 90, Gate.STATUS_OTHER),
+                      Gate.Gate(screen, (200, 0), 90, Gate.STATUS_OTHER),
+                      Gate.Gate(screen, (250, 0), 90, Gate.STATUS_OTHER)]
+        self.finish_box = FinishBox.FinishBox(screen, (-8, 0))
         
-        self.gate_sequence = [0, 1, 1, 0]
+        self.gate_sequence = [0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0]
         self.current_gate_index = 0
         self.last_gate = 0
         self.current_gate = self.gate_sequence[self.current_gate_index]
@@ -41,7 +47,8 @@ class Level:
                     self.current_gate = self.gate_sequence[self.current_gate_index]
                     self.gates[self.gate_sequence[self.current_gate]].status = Gate.STATUS_NEXT
                     
-        self.hud.update(self.current_time, self.ship.status())
+        self.hud.update(self.current_time - self.finish_box.timer, self.ship.status())
+        self.finish_box.update(self.ship.position())
         
         return
     
@@ -50,6 +57,7 @@ class Level:
         self.hud.draw()
         for gate in self.gates:
             gate.draw(self.camera_position)
+        self.finish_box.draw(self.camera_position)
         self.ship.draw(self.camera_position)
         
         return
