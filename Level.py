@@ -17,13 +17,13 @@ class Level:
         self.hud = HUD.HUD(screen)
         self.gates = [Gate.Gate(screen, (0, 0), 90, Gate.STATUS_NEXT),
                       Gate.Gate(screen, (50, 0), 90, Gate.STATUS_OTHER),
-                      Gate.Gate(screen, (100, 0), 90, Gate.STATUS_OTHER),
-                      Gate.Gate(screen, (150, 0), 90, Gate.STATUS_OTHER),
-                      Gate.Gate(screen, (200, 0), 90, Gate.STATUS_OTHER),
-                      Gate.Gate(screen, (250, 0), 90, Gate.STATUS_OTHER)]
-        self.finish_box = FinishBox.FinishBox(screen, (-8, 0))
+                      Gate.Gate(screen, (60, 10), 0, Gate.STATUS_OTHER),
+                      Gate.Gate(screen, (60, 30), 0, Gate.STATUS_OTHER),
+                      Gate.Gate(screen, (50, 40), 90, Gate.STATUS_OTHER),
+                      Gate.Gate(screen, (0, 40), 90, Gate.STATUS_OTHER)]
+        self.finish_box = FinishBox.FinishBox(screen, (-8, 40))
         
-        self.gate_sequence = [0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0]
+        self.gate_sequence = [0, 1, 2, 3, 4, 5]
         self.current_gate_index = 0
         self.last_gate = 0
         self.current_gate = self.gate_sequence[self.current_gate_index]
