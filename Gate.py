@@ -38,6 +38,7 @@ class Gate:
         return image
     
     def update(self, ship_position):
+        status_updated = False
         ship_x, ship_y = ship_position
         
         rotated_ship_x = ship_x * math.cos(-self.angular_position) - \
@@ -50,12 +51,12 @@ class Gate:
                 self.position_y * math.cos(-self.angular_position)
         
         side = rotated_ship_y - gate_rotated_y
-        if side * self.last_side < 0 and abs(gate_rotated_x - rotated_ship_x) < 23 and \
+        if side * self.last_side < 0 and abs(gate_rotated_x - rotated_ship_x) < 67 and \
                 self.status == STATUS_NEXT:
-            self.status = STATUS_LAST
+            status_updated = True
         self.last_side = side
         
-        return
+        return status_updated
     
     def draw(self, camera_position):
         camera_x, camera_y = camera_position
