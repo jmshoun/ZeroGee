@@ -12,7 +12,7 @@ class Level:
         self.start_time = pygame.time.get_ticks()
         self.camera_position = [0, 0]
         
-        self.ship = Ship.Ship(screen, (0, 0), 0)
+        self.ship = Ship.Ship(screen, (0, 0), -90)
         self.hud = HUD.HUD(screen)
         self.gates = [Gate.Gate(screen, (10, 0), 90, Gate.STATUS_NEXT)]
     

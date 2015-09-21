@@ -34,7 +34,7 @@ class Ship:
 		self.position_x, self.position_y = position
 		
 		self.velocity_angular = 0
-		self.position_angular = position_angular
+		self.position_angular = position_angular / RADIANS_TO_DEGREES
 	
 	def status(self):
 		speed = math.sqrt(self.velocity_x ** 2 + self.velocity_y ** 2) * config.METERS_PER_PIXEL
