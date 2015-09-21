@@ -30,7 +30,7 @@ class Level:
         for gate in self.gates:
             updated_status = gate.update(self.ship.position())
             if updated_status:
-                if self.current_gate > 0:
+                if self.current_gate_index > 0:
                     self.gates[self.last_gate].status = Gate.STATUS_OTHER
                     
                 self.current_gate_index += 1
