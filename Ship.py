@@ -87,7 +87,8 @@ class Ship:
 		camera_x, camera_y = camera_position
 		
 		rotated_image = pygame.transform.rotozoom(self.image,
-												  self.position_angular * RADIANS_TO_DEGREES, 0.5)
+												  self.position_angular * RADIANS_TO_DEGREES,
+												  config.SCALE_FACTOR)
 		rotated_image.set_colorkey((0, 0, 0))
 		tmp_rect = rotated_image.get_rect()
 		rotated_rect = self.rect.inflate(tmp_rect.width - self.rect.width,

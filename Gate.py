@@ -4,30 +4,38 @@ import math
 
 import pygame
 
+import config
+
 RADIANS_TO_DEGREES = 180 / math.pi
 
+STATUS_LAST = 0
+STATUS_NEXT = 1
+STATUS_OTHER = 2
+
 class Gate:
+    
     def __init__(self, screen, position, angular_position, status):
         self.screen = screen
-        self.image_last = pygame.image.load('images/gate-last.png').convert()
-        self.image_next = pygame.image.load('images/gate-next.png').convert()
-        self.image_other = pygame.image.load('images/gate-other.png').convert()
         
         self.position_x, self.position_y = position
-        self.angular_position = angular_position
-        self.status = status
+        self.position_x = self.position_x / config.METERS_PER_PIXEL
+        self.position_y = self.position_y / config.METERS_PER_PIXEL
+        self.angular_position = angular_position / RADIANS_TO_DEGREES
         
-        if self.status == 'last':
-            self.image = self.image_last
-        elif self.status == 'next':
-            self.image = self.image_next
-        else:
-            self.image = self.image_other
-            
-        self.image = pygame.transform.rotozoom(self.image,
-                                               self.angular_position * RADIANS_TO_DEGREES, 0.5)
-        self.rect = self.image.get_rect()
+        self.images = [self._init_image('gate-last'), self._init_image('gate-next'),
+                       self._init_image('gate-other')]
+        self.rect = self.images[0].get_rect()
+        
+        self.status = status
         self.last_side = 0
+        
+    def _init_image(self, image_name):
+        image = pygame.image.load('images/' + image_name + '.png')
+        image.convert()
+        image = pygame.transform.rotozoom(image, self.angular_position * RADIANS_TO_DEGREES,
+                                          config.SCALE_FACTOR)
+        
+        return image
     
     def update(self, ship_position):
         ship_x, ship_y = ship_position
@@ -43,11 +51,8 @@ class Gate:
         
         side = rotated_ship_y - gate_rotated_y
         if side * self.last_side < 0 and abs(gate_rotated_x - rotated_ship_x) < 23 and \
-                self.status == 'next':
-            self.status = 'last'
-            self.image = self.image_last
-            self.image = pygame.transform.rotozoom(self.image,
-                                               self.angular_position * RADIANS_TO_DEGREES, 0.5)
+                self.status == STATUS_NEXT:
+            self.status = STATUS_LAST
         self.last_side = side
         
         return
@@ -55,6 +60,6 @@ class Gate:
     def draw(self, camera_position):
         camera_x, camera_y = camera_position
         self.rect.center = (self.position_x - camera_x, self.position_y - camera_y)
-        self.screen.blit(self.image, self.rect.center)
+        self.screen.blit(self.images[self.status], self.rect)
         
         return

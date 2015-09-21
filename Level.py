@@ -14,7 +14,7 @@ class Level:
         
         self.ship = Ship.Ship(screen, (0, 0), 0)
         self.hud = HUD.HUD(screen)
-        self.gates = [Gate.Gate(screen, (300, 300), 0, 'next')]
+        self.gates = [Gate.Gate(screen, (10, 0), 90, Gate.STATUS_NEXT)]
     
     def update(self):
         self.current_time = (pygame.time.get_ticks() - self.start_time) / 1000
