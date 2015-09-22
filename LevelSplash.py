@@ -12,7 +12,7 @@ class LevelSplash:
         self.time = time
         self.finished = False
         
-        self.font = pygame.font.Font('fonts/Disco Nectar.ttf', 300)
+        self.font = pygame.font.Font('fonts/Disco Nectar.ttf', 250)
         self.text_surface = self.font.render(self.text, True, color)
         self.rect = self.text_surface.get_rect()
         self.rect.center = self.screen.get_rect().center
