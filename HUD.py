@@ -8,7 +8,7 @@ class HUD:
     def __init__(self, screen):
         self.time = 0
         self.speed = 0
-        self.panel = screen.subsurface(pygame.Rect(1000, 0, 360, 768))
+        self.panel = screen
         self.primary_font = pygame.font.Font('fonts/Crysta.ttf', 40)
     
     def update(self, time, status):

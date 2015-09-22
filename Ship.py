@@ -24,7 +24,7 @@ class Ship:
 	
 	def __init__(self, screen, position, position_angular):
 		self.screen = screen
-		self.center_x = 500
+		self.center_x = screen.get_rect().width / 2
 		self.center_y = screen.get_rect().height / 2
 		self.image = pygame.image.load('images/ship.png').convert()
 		self.rect = self.image.get_rect()

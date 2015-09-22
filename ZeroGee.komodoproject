@@ -2,5 +2,6 @@
 <!-- Komodo Project File - DO NOT EDIT -->
 <project id="b46e1c91-1ff6-4c3b-9139-a888e4667e8e" kpf_version="5" name="ZeroGee.komodoproject">
 <preference-set idref="b46e1c91-1ff6-4c3b-9139-a888e4667e8e" id="project" preftype="project">
+  <long id="prefs_version">1</long>
 </preference-set>
 </project>
