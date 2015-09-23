@@ -54,10 +54,16 @@ class Level:
         return
     
     def _update_set(self):
+        pressed_keys = pygame.key.get_pressed()
         if self.level_splash.finished:
             self.status = STATUS_GO
             self.start_time = pygame.time.get_ticks()
             self.level_splash = LevelSplash.LevelSplash(self.screen, "Go!", (255, 0, 255), 1.5)
+        elif pressed_keys[pygame.K_UP] or pressed_keys[pygame.K_LEFT] or \
+                pressed_keys[pygame.K_RIGHT]:
+            self.status = STATUS_FALSE_START
+            self.level_splash = LevelSplash.LevelSplash(self.screen, "False Start!",
+                                                        (255, 0, 255), 5)
         
         return
     
