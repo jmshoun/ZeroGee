@@ -13,6 +13,7 @@ STATUS_READY = 0
 STATUS_SET = 1
 STATUS_GO = 2
 STATUS_FINISHED = 3
+STATUS_FALSE_START = 4
 
 class Level:
     def __init__(self, screen):
@@ -27,7 +28,7 @@ class Level:
         self.ship = Ship.Ship(self.main_panel, (-0.1, 0), -90)
         self.hud = HUD.HUD(self.hud_panel)
         self.course = Course.Course(self.main_panel)
-        self.level_splash = LevelSplash.LevelSplash(self.screen, "Ready", (255, 0, 255), 0.7)
+        self.level_splash = LevelSplash.LevelSplash(self.screen, "Ready", (255, 0, 255), 10000)
         
         self.camera_position = self.ship.camera_position()
     
@@ -45,7 +46,8 @@ class Level:
         return
     
     def _update_ready(self):
-        if self.level_splash.finished:
+        pressed_keys = pygame.key.get_pressed()
+        if pressed_keys[pygame.K_SPACE]:
             self.status = STATUS_SET
             self.level_splash = LevelSplash.LevelSplash(self.screen, "Set...", (255, 0, 255),
                                                         .8 + random.random())
