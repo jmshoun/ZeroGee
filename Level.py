@@ -18,7 +18,7 @@ class Level:
     def __init__(self, screen):
         self.screen = screen
         self.start_time = pygame.time.get_ticks()
-        self.current_time = (pygame.time.get_ticks() - self.start_time) / 1000
+        self.current_time = 0
         self.status = STATUS_READY
         
         self.main_panel = screen.subsurface(pygame.Rect(0, 0, 1000, 768))
@@ -33,26 +33,43 @@ class Level:
     
     def update(self):
         self.level_splash.update()
-        self.hud.update(self.current_time - self.course.finish_box.timer, self.ship.status())
+        self.hud.update(self.current_time, self.ship.status())
         
-        if self.status is STATUS_READY and self.level_splash.finished:
+        if self.status is STATUS_READY:
+            self._update_ready()
+        elif self.status is STATUS_SET:
+            self._update_set()
+        elif self.status is STATUS_GO:
+            self._update_go()
+        
+        return
+    
+    def _update_ready(self):
+        if self.level_splash.finished:
             self.status = STATUS_SET
             self.level_splash = LevelSplash.LevelSplash(self.screen, "Set...", (255, 0, 255),
                                                         .8 + random.random())
-        elif self.status is STATUS_SET and self.level_splash.finished:
+        return
+    
+    def _update_set(self):
+        if self.level_splash.finished:
             self.status = STATUS_GO
             self.start_time = pygame.time.get_ticks()
             self.level_splash = LevelSplash.LevelSplash(self.screen, "Go!", (255, 0, 255), 1.5)
-        elif self.status is STATUS_GO:
+        
+        return
+    
+    def _update_go(self):
+        if self.course.finish_box.timer == 0:
             self.current_time = (pygame.time.get_ticks() - self.start_time) / 1000
         
-            self.ship.update()
-            self.camera_position = self.ship.camera_position()
+        self.ship.update()
+        self.camera_position = self.ship.camera_position()
         
-            self.course.update(self.ship.position())
-            if self.course.finish_box.finished:
-                self.status = STATUS_FINISHED
-                self.level_splash = LevelSplash.LevelSplash(self.screen, "Finished", (255, 0, 255), 5)
+        self.course.update(self.ship.position())
+        if self.course.finish_box.finished:
+            self.status = STATUS_FINISHED
+            self.level_splash = LevelSplash.LevelSplash(self.screen, "Finished", (255,  0, 255), 5)
         
         return
     
