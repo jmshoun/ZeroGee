@@ -9,13 +9,20 @@ class Course:
     def __init__(self, panel):
         self.gates = [Gate.Gate(panel, (0, 0), 90, Gate.STATUS_NEXT),
                       Gate.Gate(panel, (50, 0), 90, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (60, 10), 0, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (60, 30), 0, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (50, 40), 90, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (0, 40), 90, Gate.STATUS_OTHER)]
-        self.finish_box = FinishBox.FinishBox(panel, (-8, 40))
+                      Gate.Gate(panel, (72.51, 9.32), 45, Gate.STATUS_OTHER),
+                      Gate.Gate(panel, (81.83, 31.83), 0, Gate.STATUS_OTHER),
+                      Gate.Gate(panel, (72.51, 54.34), -45, Gate.STATUS_OTHER),
+                      Gate.Gate(panel, (50, 63.66), 90, Gate.STATUS_OTHER),
+                      Gate.Gate(panel, (0, 63.66), 90, Gate.STATUS_OTHER),
+                      Gate.Gate(panel, (-50, 63.66), 90, Gate.STATUS_OTHER),
+                      Gate.Gate(panel, (-72.51, 54.34), 45, Gate.STATUS_OTHER),
+                      Gate.Gate(panel, (-81.83, 31.83), 0, Gate.STATUS_OTHER),
+                      Gate.Gate(panel, (-72.51, 9.32), -45, Gate.STATUS_OTHER),
+                      Gate.Gate(panel, (-50, 0), 90, Gate.STATUS_OTHER),
+                      Gate.Gate(panel, (-20, 0), 90, Gate.STATUS_OTHER)]
+        self.finish_box = FinishBox.FinishBox(panel, (-12, 0))
         
-        self.gate_sequence = [0, 1, 2, 3, 4, 5]
+        self.gate_sequence = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
         self.current_gate_index = 0
         self.last_gate = 0
         self.current_gate = self.gate_sequence[self.current_gate_index]

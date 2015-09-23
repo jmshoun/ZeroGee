@@ -40,18 +40,18 @@ class Gate:
         status_updated = False
         ship_x, ship_y = ship_position
         
-        rotated_ship_x = ship_x * math.cos(-self.angular_position) - \
-                ship_y * math.sin(-self.angular_position)
-        rotated_ship_y = ship_x * math.sin(-self.angular_position) + \
-                ship_y * math.cos(-self.angular_position)
-        gate_rotated_x = self.position_x * math.cos(-self.angular_position) - \
-                self.position_y * math.sin(-self.angular_position)
-        gate_rotated_y = self.position_x * math.sin(-self.angular_position) + \
-                self.position_y * math.cos(-self.angular_position)
+        ship_rotated_x = ship_x * math.cos(self.angular_position) - \
+                ship_y * math.sin(self.angular_position)
+        ship_rotated_y = ship_x * math.sin(self.angular_position) + \
+                ship_y * math.cos(self.angular_position)
+        gate_rotated_x = self.position_x * math.cos(self.angular_position) - \
+                self.position_y * math.sin(self.angular_position)
+        gate_rotated_y = self.position_x * math.sin(self.angular_position) + \
+                self.position_y * math.cos(self.angular_position)
         
-        side = rotated_ship_y - gate_rotated_y
-        if side * self.last_side < 0 and abs(gate_rotated_x - rotated_ship_x) < 67 and \
-                self.status == STATUS_NEXT:
+        side = ship_rotated_y - gate_rotated_y
+        distance_from_center = abs(ship_rotated_x - gate_rotated_x)
+        if side * self.last_side < 0 and distance_from_center < 67 and self.status == STATUS_NEXT:
             status_updated = True
         self.last_side = side
         
