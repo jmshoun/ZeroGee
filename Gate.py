@@ -61,5 +61,3 @@ class Gate:
         camera_x, camera_y = camera_position
         self.rect.center = (self.position_x - camera_x, self.position_y - camera_y)
         self.screen.blit(self.images[self.status], self.rect)
-        
-        return

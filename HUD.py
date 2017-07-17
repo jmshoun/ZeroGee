@@ -9,13 +9,12 @@ class HUD:
         self.time = 0
         self.speed = 0
         self.panel = screen
+        self.fuel_mass = None
         self.primary_font = pygame.font.Font('fonts/digital-7.ttf', 40)
     
     def update(self, time, status):
         self.time = time
         self.speed, self.fuel_mass = status
-        
-        return
     
     def draw(self):
         title_surface = self.primary_font.render("LEVEL 1", True, (255, 255, 255))
@@ -33,5 +32,3 @@ class HUD:
         self.panel.blit(time_surface, (10, 100))
         self.panel.blit(speed_surface, (10, 190))
         self.panel.blit(fuel_surface, (10, 280))
-        
-        return

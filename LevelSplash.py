@@ -25,5 +25,3 @@ class LevelSplash:
     
     def draw(self):
         self.screen.blit(self.text_surface, self.rect)
-        return
-    

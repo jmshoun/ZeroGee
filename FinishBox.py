@@ -44,12 +44,8 @@ class FinishBox:
         if needs_drawing:
             self.color = START_COLOR + (self.timer / BOX_TIMER) * (FINISH_COLOR - START_COLOR)
             pygame.draw.rect(self.image, (self.color, self.color, self.color), self.image_rect)
-        
-        return
     
     def draw(self, camera_position):
         camera_x, camera_y = camera_position
         self.rect.center = (self.position_x - camera_x, self.position_y - camera_y)
         self.screen.blit(self.image, self.rect)
-        
-        return

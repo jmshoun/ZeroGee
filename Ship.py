@@ -38,7 +38,7 @@ class Ship:
     
     def status(self):
         speed = math.sqrt(self.velocity_x ** 2 + self.velocity_y ** 2) * config.METERS_PER_PIXEL
-        return (speed, self.fuel_mass)
+        return speed, self.fuel_mass
     
     def camera_position(self):
         absolute_offset_x = abs(self.velocity_x) ** .6 * .5
@@ -51,7 +51,7 @@ class Ship:
                 offset_y - self.center_y + self.position_y]
     
     def position(self):
-        return (self.position_x, self.position_y)
+        return self.position_x, self.position_y
     
     def update(self):
         if self.fuel_mass > 0:
@@ -60,8 +60,6 @@ class Ship:
         self.position_angular += self.velocity_angular * config.TICK_SIZE
         self.position_x += self.velocity_x * config.TICK_SIZE
         self.position_y += self.velocity_y * config.TICK_SIZE
-        
-        return
     
     def _handle_keyboard_input(self):
         pressed_keys = pygame.key.get_pressed()
@@ -80,8 +78,6 @@ class Ship:
             self.velocity_y -= acceleration * math.cos(self.position_angular)
             self.velocity_x -= acceleration * math.sin(self.position_angular)
             self.fuel_mass -= self.THRUST_FUEL_RATE * config.TICK_SIZE
-        
-        return
     
     def draw(self, camera_position):
         camera_x, camera_y = camera_position
@@ -97,5 +93,3 @@ class Ship:
         rotated_rect.center = (self.position_x - camera_x, self.position_y - camera_y)
         
         self.screen.blit(rotated_image, rotated_rect)
-
-        return

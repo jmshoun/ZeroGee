@@ -42,8 +42,6 @@ class Level:
             self._update_set()
         elif self.status is STATUS_GO:
             self._update_go()
-        
-        return
     
     def _update_ready(self):
         pressed_keys = pygame.key.get_pressed()
@@ -51,7 +49,6 @@ class Level:
             self.status = STATUS_SET
             self.level_splash = LevelSplash.LevelSplash(self.screen, "Set...", (255, 0, 255),
                                                         .8 + random.random())
-        return
     
     def _update_set(self):
         pressed_keys = pygame.key.get_pressed()
@@ -64,8 +61,6 @@ class Level:
             self.status = STATUS_FALSE_START
             self.level_splash = LevelSplash.LevelSplash(self.screen, "False Start!",
                                                         (255, 0, 255), 5)
-        
-        return
     
     def _update_go(self):
         if self.course.finish_box.timer == 0:
@@ -78,8 +73,6 @@ class Level:
         if self.course.finish_box.finished:
             self.status = STATUS_FINISHED
             self.level_splash = LevelSplash.LevelSplash(self.screen, "Finished", (255,  0, 255), 5)
-        
-        return
     
     def draw(self):
         self.screen.fill((0, 0, 0))
@@ -88,5 +81,3 @@ class Level:
         self.ship.draw(self.camera_position)
         if not self.level_splash.finished:
             self.level_splash.draw()
-        
-        return
