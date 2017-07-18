@@ -14,6 +14,7 @@ pygame.display.set_caption('ZeroGee')
 clock = pygame.time.Clock()
 level = Level.Level(screen)
 
+
 def check_for_termination():
     pressed_keys = pygame.key.get_pressed()
     return pressed_keys[pygame.K_ESCAPE]

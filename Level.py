@@ -15,7 +15,8 @@ STATUS_GO = 2
 STATUS_FINISHED = 3
 STATUS_FALSE_START = 4
 
-class Level:
+
+class Level(object):
     def __init__(self, screen):
         self.screen = screen
         self.start_time = pygame.time.get_ticks()

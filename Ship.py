@@ -8,7 +8,8 @@ import config
 
 RADIANS_TO_DEGREES = 180 / math.pi
 
-class Ship:
+
+class Ship(object):
     DRY_MASS = 1000.0                 # kg
     STARTING_FUEL_MASS = 200.0        # kg
     LENGTH = 2.5                     # m

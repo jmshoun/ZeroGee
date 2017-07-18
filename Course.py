@@ -5,7 +5,8 @@ import pygame
 import Gate
 import FinishBox
 
-class Course:
+
+class Course(object):
     def __init__(self, panel):
         self.gates = [Gate.Gate(panel, (0, 0), 90, Gate.STATUS_NEXT),
                       Gate.Gate(panel, (50, 0), 90, Gate.STATUS_OTHER),

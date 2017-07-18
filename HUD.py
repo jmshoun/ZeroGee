@@ -4,7 +4,8 @@ import math
 
 import pygame
 
-class HUD:
+
+class HUD(object):
     def __init__(self, screen):
         self.time = 0
         self.speed = 0

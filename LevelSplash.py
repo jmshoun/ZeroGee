@@ -4,7 +4,8 @@ import pygame
 
 import config
 
-class LevelSplash:
+
+class LevelSplash(object):
     def __init__(self, screen, text, color, time):
         self.screen = screen
         self.text = text

@@ -9,8 +9,8 @@ BOX_SIZE = 12
 START_COLOR = 50
 FINISH_COLOR = 255
 
-class FinishBox:
-    
+
+class FinishBox(object):
     def __init__(self, screen, position):
         self.screen = screen
         
