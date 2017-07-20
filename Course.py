@@ -1,29 +1,22 @@
 #!/usr/bin/env python3
 
-import pygame
+import yaml
 
 import Gate
 import FinishBox
 
 
 class Course(object):
-    def __init__(self, panel):
-        self.gates = [Gate.Gate(panel, (0, 0), 90, Gate.STATUS_NEXT),
-                      Gate.Gate(panel, (50, 0), 90, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (72.51, 9.32), 45, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (81.83, 31.83), 0, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (72.51, 54.34), -45, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (50, 63.66), 90, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (0, 63.66), 90, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (-50, 63.66), 90, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (-72.51, 54.34), 45, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (-81.83, 31.83), 0, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (-72.51, 9.32), -45, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (-50, 0), 90, Gate.STATUS_OTHER),
-                      Gate.Gate(panel, (-20, 0), 90, Gate.STATUS_OTHER)]
-        self.finish_box = FinishBox.FinishBox(panel, (-12, 0))
-        
-        self.gate_sequence = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    def __init__(self, panel, course_path):
+        with open(course_path) as course_file:
+            course_dict = yaml.load(course_file.read())
+
+        self.gates = [Gate.Gate.from_dict(panel, gate)
+                      for gate in course_dict["gates"]]
+        self.gates[0].status = Gate.STATUS_NEXT
+        self.gate_sequence = course_dict["gate_sequence"]
+        self.finish_box = FinishBox.FinishBox(panel, course_dict["finish_box"])
+
         self.current_gate_index = 0
         self.last_gate = 0
         self.current_gate = self.gate_sequence[self.current_gate_index]

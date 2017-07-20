@@ -14,7 +14,7 @@ STATUS_OTHER = 2
 
 
 class Gate(object):
-    def __init__(self, screen, position, angular_position, status):
+    def __init__(self, screen, position, angular_position, status=STATUS_OTHER):
         self.screen = screen
         
         self.position_x, self.position_y = position
@@ -28,6 +28,10 @@ class Gate(object):
         
         self.status = status
         self.last_side = 0
+
+    @classmethod
+    def from_dict(cls, screen, dict_):
+        return cls(screen, dict_["position"], dict_["angle"])
         
     def _init_image(self, image_name):
         image = pygame.image.load('images/' + image_name + '.png')

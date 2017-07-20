@@ -17,7 +17,7 @@ STATUS_FALSE_START = 4
 
 
 class Level(object):
-    def __init__(self, screen):
+    def __init__(self, screen, course_path):
         self.screen = screen
         self.start_time = pygame.time.get_ticks()
         self.current_time = 0
@@ -28,7 +28,7 @@ class Level(object):
         
         self.ship = Ship.Ship(self.main_panel, (-0.1, 0), -90)
         self.hud = HUD.HUD(self.hud_panel)
-        self.course = Course.Course(self.main_panel)
+        self.course = Course.Course(self.main_panel, course_path)
         self.level_splash = LevelSplash.LevelSplash(self.screen, "Ready", (255, 0, 255), 10000)
         
         self.camera_position = self.ship.camera_position()

@@ -12,7 +12,7 @@ screen = pygame.display.set_mode((1360, 768), pygame.FULLSCREEN)
 pygame.display.set_caption('ZeroGee')
 
 clock = pygame.time.Clock()
-level = Level.Level(screen)
+level = Level.Level(screen, "levels/circle.yaml")
 
 
 def check_for_termination():
