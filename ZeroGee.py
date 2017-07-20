@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import sys
+
 import pygame
 from pygame.locals import *
 
@@ -12,7 +14,7 @@ screen = pygame.display.set_mode((1360, 768), pygame.FULLSCREEN)
 pygame.display.set_caption('ZeroGee')
 
 clock = pygame.time.Clock()
-level = Level.Level(screen, "levels/circle.yaml")
+level = Level.Level(screen, sys.argv[1])
 
 
 def check_for_termination():
