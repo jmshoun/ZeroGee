@@ -8,6 +8,7 @@ import Ship
 import HUD
 import Course
 import LevelSplash
+import Starfield
 
 STATUS_READY = 0
 STATUS_SET = 1
@@ -40,6 +41,7 @@ class Level(object):
         self.ship = Ship.Ship(self.main_panel.surface, (-0.1, 0), -90)
         self.hud = HUD.HUD(self.hud_panel.surface)
         self.course = Course.Course(self.main_panel.surface, course_path)
+        self.starfield = Starfield.Starfield(self.main_panel.surface)
         self.level_splash = LevelSplash.LevelSplash(self.screen, "Ready", (255, 0, 255), 10000)
         
         self.camera_position = self.ship.camera_position()
@@ -93,5 +95,6 @@ class Level(object):
         self.hud.draw()
         self.course.draw(self.camera_position)
         self.ship.draw(self.camera_position)
+        self.starfield.draw(self.camera_position)
         if not self.level_splash.finished:
             self.level_splash.draw()
