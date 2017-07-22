@@ -10,7 +10,7 @@ import config
 
 pygame.init()
 pygame.font.init()
-screen = pygame.display.set_mode((1360, 768), pygame.FULLSCREEN)
+screen = pygame.display.set_mode(config.SCREEN_RESOLUTION, pygame.FULLSCREEN)
 pygame.display.set_caption('ZeroGee')
 
 clock = pygame.time.Clock()

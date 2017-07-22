@@ -11,8 +11,8 @@ FINISH_COLOR = 255
 
 
 class FinishBox(object):
-    def __init__(self, screen, position):
-        self.screen = screen
+    def __init__(self, panel, position):
+        self.panel = panel
         
         self.position_x, self.position_y = position
         self.position_x = self.position_x / config.METERS_PER_PIXEL
@@ -48,4 +48,4 @@ class FinishBox(object):
     def draw(self, camera_position):
         camera_x, camera_y = camera_position
         self.rect.center = (self.position_x - camera_x, self.position_y - camera_y)
-        self.screen.blit(self.image, self.rect)
+        self.panel.blit(self.image, self.rect)

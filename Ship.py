@@ -23,10 +23,10 @@ class Ship(object):
     FORCE = EXHAUST_VELOCITY * THRUST_FUEL_RATE
     TORQUE = EXHAUST_VELOCITY * ROTATE_FUEL_RATE * ROTATE_THRUSTER_POSITION
     
-    def __init__(self, screen, position, position_angular):
-        self.screen = screen
-        self.center_x = screen.get_rect().width / 2
-        self.center_y = screen.get_rect().height / 2
+    def __init__(self, panel, position, position_angular):
+        self.panel = panel
+        self.center_x = panel.get_rect().width / 2
+        self.center_y = panel.get_rect().height / 2
         self.image = pygame.image.load('images/ship.png').convert()
         self.rect = self.image.get_rect()
         
@@ -93,4 +93,4 @@ class Ship(object):
         
         rotated_rect.center = (self.position_x - camera_x, self.position_y - camera_y)
         
-        self.screen.blit(rotated_image, rotated_rect)
+        self.panel.blit(rotated_image, rotated_rect)

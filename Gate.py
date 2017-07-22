@@ -14,8 +14,8 @@ STATUS_OTHER = 2
 
 
 class Gate(object):
-    def __init__(self, screen, position, angular_position, status=STATUS_OTHER):
-        self.screen = screen
+    def __init__(self, panel, position, angular_position, status=STATUS_OTHER):
+        self.panel = panel
         
         self.position_x, self.position_y = position
         self.position_x = self.position_x / config.METERS_PER_PIXEL
@@ -65,4 +65,4 @@ class Gate(object):
     def draw(self, camera_position):
         camera_x, camera_y = camera_position
         self.rect.center = (self.position_x - camera_x, self.position_y - camera_y)
-        self.screen.blit(self.images[self.status], self.rect)
+        self.panel.blit(self.images[self.status], self.rect)

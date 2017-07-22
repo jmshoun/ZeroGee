@@ -6,10 +6,10 @@ import pygame
 
 
 class HUD(object):
-    def __init__(self, screen):
+    def __init__(self, panel):
         self.time = 0
         self.speed = 0
-        self.panel = screen
+        self.panel = panel
         self.fuel_mass = None
         self.primary_font = pygame.font.Font('fonts/digital-7.ttf', 40)
     

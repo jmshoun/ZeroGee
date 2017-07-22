@@ -16,6 +16,17 @@ STATUS_FINISHED = 3
 STATUS_FALSE_START = 4
 
 
+class Panel(object):
+    def __init__(self, surface, border_width=1, border_color=(200, 200, 200)):
+        self.surface = surface
+        self.border_width = border_width
+        self.border_color = border_color
+
+    def draw(self):
+        pygame.draw.rect(self.surface, self.border_color,
+                         self.surface.get_rect(), self.border_width)
+
+
 class Level(object):
     def __init__(self, screen, course_path):
         self.screen = screen
@@ -23,12 +34,12 @@ class Level(object):
         self.current_time = 0
         self.status = STATUS_READY
         
-        self.main_panel = screen.subsurface(pygame.Rect(0, 0, 1000, 768))
-        self.hud_panel = screen.subsurface(pygame.Rect(1000, 0, 360, 768))
+        self.main_panel = Panel(screen.subsurface(pygame.Rect(0, 0, 1000, 768)))
+        self.hud_panel = Panel(screen.subsurface(pygame.Rect(1000, 0, 360, 768)))
         
-        self.ship = Ship.Ship(self.main_panel, (-0.1, 0), -90)
-        self.hud = HUD.HUD(self.hud_panel)
-        self.course = Course.Course(self.main_panel, course_path)
+        self.ship = Ship.Ship(self.main_panel.surface, (-0.1, 0), -90)
+        self.hud = HUD.HUD(self.hud_panel.surface)
+        self.course = Course.Course(self.main_panel.surface, course_path)
         self.level_splash = LevelSplash.LevelSplash(self.screen, "Ready", (255, 0, 255), 10000)
         
         self.camera_position = self.ship.camera_position()
@@ -77,6 +88,8 @@ class Level(object):
     
     def draw(self):
         self.screen.fill((0, 0, 0))
+        self.main_panel.draw()
+        self.hud_panel.draw()
         self.hud.draw()
         self.course.draw(self.camera_position)
         self.ship.draw(self.camera_position)
