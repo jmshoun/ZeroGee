@@ -1,5 +1,16 @@
-SCREEN_RESOLUTION = (1360, 768)
-TICK_SIZE = 0.02
-RAW_METERS_PER_PIXEL = 0.15
-SCALE_FACTOR = 0.75
-METERS_PER_PIXEL = RAW_METERS_PER_PIXEL * SCALE_FACTOR
+import yaml
+
+
+def read_config_section(section, filename="config.yaml"):
+    with open(filename, "r") as file:
+        config = yaml.load(file)
+    return config[section]
+
+
+class DisplaySettings(object):
+    def __init__(self, filename="config.yaml"):
+        config = read_config_section("display", filename)
+        self.screen_resolution = tuple(config["screen_resolution"])
+        self.tick_size = config["tick_size"]
+        self.scale_factor = config["scale_factor"]
+        self.meters_per_pixel = config["meters_per_pixel"] * self.scale_factor

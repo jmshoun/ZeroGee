@@ -1,19 +1,16 @@
 import random
 
-import pygame
+import config
 
 
 class Starfield(object):
-    NUM_STARS = [400, 200, 100]
-    PARALLAX_RATES = [0.20, 0.12, 0.06]
-    LUMINOSITY = [100, 70, 40]
-
     def __init__(self, panel):
+        settings = config.read_config_section(section="starfield")
         self.panel = panel
         width, height = panel.get_size()
         self.stars = []
         for num_stars, parallax_rate, luminosity \
-                in zip(self.NUM_STARS, self.PARALLAX_RATES, self.LUMINOSITY):
+                in zip(settings["num_stars"], settings["parallax_rate"], settings["luminosity"]):
             self.stars += [Star(width, height, luminosity, parallax_rate)
                            for _ in range(num_stars)]
 

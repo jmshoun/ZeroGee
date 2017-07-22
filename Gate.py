@@ -6,6 +6,7 @@ import pygame
 
 import config
 
+settings = config.DisplaySettings()
 RADIANS_TO_DEGREES = 180 / math.pi
 
 STATUS_LAST = 0
@@ -18,8 +19,8 @@ class Gate(object):
         self.panel = panel
         
         self.position_x, self.position_y = position
-        self.position_x = self.position_x / config.METERS_PER_PIXEL
-        self.position_y = self.position_y / config.METERS_PER_PIXEL
+        self.position_x = self.position_x / settings.meters_per_pixel
+        self.position_y = self.position_y / settings.meters_per_pixel
         self.angular_position = angular_position / RADIANS_TO_DEGREES
         
         self.images = [self._init_image('gate-last'), self._init_image('gate-next'),
@@ -37,7 +38,7 @@ class Gate(object):
         image = pygame.image.load('images/' + image_name + '.png')
         image.convert()
         image = pygame.transform.rotozoom(image, self.angular_position * RADIANS_TO_DEGREES,
-                                          config.SCALE_FACTOR)
+                                          settings.scale_factor)
         
         return image
     

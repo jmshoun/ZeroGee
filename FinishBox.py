@@ -4,6 +4,7 @@ import pygame
 
 import config
 
+settings = config.DisplaySettings()
 BOX_TIMER = 5
 BOX_SIZE = 12
 START_COLOR = 50
@@ -15,10 +16,10 @@ class FinishBox(object):
         self.panel = panel
         
         self.position_x, self.position_y = position
-        self.position_x = self.position_x / config.METERS_PER_PIXEL
-        self.position_y = self.position_y / config.METERS_PER_PIXEL
-        self.image_rect = pygame.Rect(0, 0, BOX_SIZE / config.METERS_PER_PIXEL,
-                                      BOX_SIZE / config.METERS_PER_PIXEL)
+        self.position_x = self.position_x / settings.meters_per_pixel
+        self.position_y = self.position_y / settings.meters_per_pixel
+        self.image_rect = pygame.Rect(0, 0, BOX_SIZE / settings.meters_per_pixel,
+                                      BOX_SIZE / settings.meters_per_pixel)
         self.location_rect = self.image_rect.copy()
         self.location_rect.center = (self.position_x, self.position_y)
         self.rect = self.image_rect.copy()
@@ -33,7 +34,7 @@ class FinishBox(object):
         needs_drawing = False
         
         if self.location_rect.collidepoint(ship_position):
-            self.timer = min(self.timer + config.TICK_SIZE, BOX_TIMER)
+            self.timer = min(self.timer + settings.tick_size, BOX_TIMER)
             if self.timer == BOX_TIMER:
                 self.finished = True
             needs_drawing = True

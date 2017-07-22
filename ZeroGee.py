@@ -8,9 +8,10 @@ from pygame.locals import *
 import Level
 import config
 
+settings = config.DisplaySettings()
 pygame.init()
 pygame.font.init()
-screen = pygame.display.set_mode(config.SCREEN_RESOLUTION, pygame.FULLSCREEN)
+screen = pygame.display.set_mode(settings.screen_resolution, pygame.FULLSCREEN)
 pygame.display.set_caption('ZeroGee')
 
 clock = pygame.time.Clock()
@@ -28,4 +29,4 @@ while not check_for_termination():
     level.draw()
     
     pygame.display.flip()
-    clock.tick(1 / config.TICK_SIZE)
+    clock.tick(1 / settings.tick_size)

@@ -4,6 +4,7 @@ import pygame
 
 import config
 
+settings = config.DisplaySettings()
 
 class LevelSplash(object):
     def __init__(self, screen, text, color, time):
@@ -19,7 +20,7 @@ class LevelSplash(object):
         self.rect.center = self.screen.get_rect().center
     
     def update(self):
-        self.time -= config.TICK_SIZE
+        self.time -= settings.tick_size
         if self.time < 0:
             self.finished = True
         return self.finished

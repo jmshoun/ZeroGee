@@ -1,0 +1,9 @@
+display:
+  screen_resolution: [1360, 768]
+  tick_size: 0.02
+  meters_per_pixel: 0.15
+  scale_factor: 0.75
+starfield:
+  num_stars: [400, 200, 100]
+  parallax_rate: [0.20, 0.12, 0.06]
+  luminosity: [100, 70, 40]
