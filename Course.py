@@ -19,6 +19,7 @@ class Course(object):
 
         self.current_gate_index = 0
         self.last_gate = 0
+        self.num_gates = len(self.gate_sequence)
         self.current_gate = self.gate_sequence[self.current_gate_index]
     
     def update(self, ship_position):
@@ -28,6 +29,9 @@ class Course(object):
                 self._update_gate_status()
         
         self.finish_box.update(ship_position)
+
+    def status(self):
+        return self.current_gate_index, self.num_gates
     
     def _update_gate_status(self):
         self._update_last_gate()

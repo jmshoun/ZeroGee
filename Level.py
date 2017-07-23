@@ -58,14 +58,13 @@ class Level(object):
     
     def update(self):
         self.level_splash.update()
-        self.hud.update(self.current_time, self.ship.status())
-        
         if self.status is STATUS_READY:
             self._update_ready()
         elif self.status is STATUS_SET:
             self._update_set()
         elif self.status is STATUS_GO:
             self._update_go()
+        self.hud.update(self.current_time, self.course.status(), self.ship.status())
     
     def _update_ready(self):
         pressed_keys = pygame.key.get_pressed()
