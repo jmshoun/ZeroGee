@@ -1,6 +1,5 @@
 import yaml
 
-
 def read_config_section(section, filename="config.yaml"):
     with open(filename, "r") as file:
         config = yaml.load(file)
@@ -14,3 +13,4 @@ class DisplaySettings(object):
         self.tick_size = config["tick_size"]
         self.scale_factor = config["scale_factor"]
         self.meters_per_pixel = config["meters_per_pixel"] * self.scale_factor
+

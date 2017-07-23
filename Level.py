@@ -7,14 +7,24 @@ import pygame
 import Ship
 import HUD
 import Course
-import LevelSplash
 import Starfield
+import config
 
+settings = config.DisplaySettings()
 STATUS_READY = 0
 STATUS_SET = 1
 STATUS_GO = 2
 STATUS_FINISHED = 3
 STATUS_FALSE_START = 4
+
+PANEL_SIZES = {
+    (1360, 768): {
+        "main_rect": [0, 0, 1000, 768],
+        "hud_rect": [1000, 0, 360, 768]
+    }
+}
+
+panel_sizes = PANEL_SIZES[settings.screen_resolution]
 
 
 class Panel(object):
@@ -35,14 +45,14 @@ class Level(object):
         self.current_time = 0
         self.status = STATUS_READY
         
-        self.main_panel = Panel(screen.subsurface(pygame.Rect(0, 0, 1000, 768)))
-        self.hud_panel = Panel(screen.subsurface(pygame.Rect(1000, 0, 360, 768)))
+        self.main_panel = Panel(screen.subsurface(pygame.Rect(*panel_sizes["main_rect"])))
+        self.hud_panel = Panel(screen.subsurface(pygame.Rect(*panel_sizes["hud_rect"])))
         
         self.ship = Ship.Ship(self.main_panel.surface, (-0.1, 0), -90)
         self.hud = HUD.HUD(self.hud_panel.surface)
         self.course = Course.Course(self.main_panel.surface, course_path)
         self.starfield = Starfield.Starfield(self.main_panel.surface)
-        self.level_splash = LevelSplash.LevelSplash(self.screen, "Ready", (255, 0, 255), 10000)
+        self.level_splash = LevelSplash(self.screen, "Ready", (255, 0, 255), 10000)
         
         self.camera_position = self.ship.camera_position()
     
@@ -61,20 +71,20 @@ class Level(object):
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[pygame.K_SPACE]:
             self.status = STATUS_SET
-            self.level_splash = LevelSplash.LevelSplash(self.screen, "Set...", (255, 0, 255),
-                                                        .8 + random.random())
+            self.level_splash = LevelSplash(self.screen, "Set...", (255, 0, 255),
+                                            .8 + random.random())
     
     def _update_set(self):
         pressed_keys = pygame.key.get_pressed()
         if self.level_splash.finished:
             self.status = STATUS_GO
             self.start_time = pygame.time.get_ticks()
-            self.level_splash = LevelSplash.LevelSplash(self.screen, "Go!", (255, 0, 255), 1.5)
+            self.level_splash = LevelSplash(self.screen, "Go!", (255, 0, 255), 1.5)
         elif pressed_keys[pygame.K_UP] or pressed_keys[pygame.K_LEFT] or \
                 pressed_keys[pygame.K_RIGHT]:
             self.status = STATUS_FALSE_START
-            self.level_splash = LevelSplash.LevelSplash(self.screen, "False Start!",
-                                                        (255, 0, 255), 5)
+            self.level_splash = LevelSplash(self.screen, "False Start!",
+                                            (255, 0, 255), 5)
     
     def _update_go(self):
         if self.course.finish_box.timer == 0:
@@ -86,7 +96,7 @@ class Level(object):
         self.course.update(self.ship.position())
         if self.course.finish_box.finished:
             self.status = STATUS_FINISHED
-            self.level_splash = LevelSplash.LevelSplash(self.screen, "Finished", (255,  0, 255), 5)
+            self.level_splash = LevelSplash(self.screen, "Finished", (255,  0, 255), 5)
     
     def draw(self):
         self.screen.fill((0, 0, 0))
@@ -98,3 +108,26 @@ class Level(object):
         self.starfield.draw(self.camera_position)
         if not self.level_splash.finished:
             self.level_splash.draw()
+
+
+class LevelSplash(object):
+    def __init__(self, screen, text, color, time):
+        self.screen = screen
+        self.text = text
+        self.color = color
+        self.time = time
+        self.finished = False
+
+        self.font = pygame.font.Font('fonts/Disco Nectar.ttf', 250)
+        self.text_surface = self.font.render(self.text, True, color)
+        self.rect = self.text_surface.get_rect()
+        self.rect.center = self.screen.get_rect().center
+
+    def update(self):
+        self.time -= settings.tick_size
+        if self.time < 0:
+            self.finished = True
+        return self.finished
+
+    def draw(self):
+        self.screen.blit(self.text_surface, self.rect)
