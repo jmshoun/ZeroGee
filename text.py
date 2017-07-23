@@ -13,6 +13,7 @@ CENTER = (0.5, 0.5)
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+BLUE = (0, 0, 255)
 
 
 def render_text(surface, font, text, location, foreground=WHITE, background=BLACK,
