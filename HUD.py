@@ -12,7 +12,7 @@ class HUD(object):
         self.speed = 0
         self.panel = panel
         self.fuel_mass = None
-        self.primary_font = pygame.freetype.Font('fonts/digital-7.ttf')
+        self.primary_font = pygame.freetype.Font('fonts/digital-7 (mono italic).ttf')
     
     def update(self, time, status):
         self.time = time
