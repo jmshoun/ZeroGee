@@ -8,6 +8,7 @@ import Ship
 import HUD
 import Course
 import Starfield
+import MiniMap
 import config
 
 settings = config.DisplaySettings()
@@ -20,7 +21,8 @@ STATUS_FALSE_START = 4
 PANEL_SIZES = {
     (1360, 768): {
         "main_rect": [0, 0, 1000, 768],
-        "hud_rect": [1000, 0, 360, 768]
+        "hud_rect": [1000, 0, 360, 500],
+        "minimap_rect": [1000, 500, 360, 268]
     }
 }
 
@@ -47,13 +49,16 @@ class Level(object):
         
         self.main_panel = Panel(screen.subsurface(pygame.Rect(*panel_sizes["main_rect"])))
         self.hud_panel = Panel(screen.subsurface(pygame.Rect(*panel_sizes["hud_rect"])))
+        self.minimap_panel = Panel(screen.subsurface(pygame.Rect(*panel_sizes["minimap_rect"])))
         
         self.ship = Ship.Ship(self.main_panel.surface, (-0.1, 0), -90)
-        self.hud = HUD.HUD(self.hud_panel.surface)
         self.course = Course.Course(self.main_panel.surface, course_path)
+
         self.starfield = Starfield.Starfield(self.main_panel.surface)
         self.level_splash = LevelSplash(self.screen, "Ready", (255, 0, 255), 10000)
-        
+
+        self.hud = HUD.HUD(self.hud_panel.surface)
+        self.minimap = MiniMap.MiniMap(self.minimap_panel.surface, self.course, self.ship)
         self.camera_position = self.ship.camera_position()
     
     def update(self):
@@ -101,7 +106,9 @@ class Level(object):
         self.screen.fill((0, 0, 0))
         self.main_panel.draw()
         self.hud_panel.draw()
+        self.minimap_panel.draw()
         self.hud.draw()
+        self.minimap.draw()
         self.course.draw(self.camera_position)
         self.ship.draw(self.camera_position)
         self.starfield.draw(self.camera_position)

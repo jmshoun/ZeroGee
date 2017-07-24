@@ -21,6 +21,17 @@ class Course(object):
         self.last_gate = 0
         self.num_gates = len(self.gate_sequence)
         self.current_gate = self.gate_sequence[self.current_gate_index]
+
+    def bounding_box(self):
+        min_x = min([gate.position_x for gate in self.gates])
+        max_x = max([gate.position_x for gate in self.gates])
+        min_y = min([gate.position_y for gate in self.gates])
+        max_y = max([gate.position_y for gate in self.gates])
+        min_x = min(min_x, self.finish_box.position_x)
+        max_x = max(max_x, self.finish_box.position_x)
+        min_y = min(min_y, self.finish_box.position_y)
+        max_y = max(max_y, self.finish_box.position_y)
+        return min_x, max_x, min_y, max_y
     
     def update(self, ship_position):
         for gate in self.gates:
