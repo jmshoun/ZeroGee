@@ -11,6 +11,7 @@ RADIANS_TO_DEGREES = 180 / math.pi
 
 
 class Ship(object):
+    SCALE_FACTOR = 0.6
     DRY_MASS = 1000.0                   # kg
     STARTING_FUEL_MASS = 200.0          # kg
     LENGTH = 2.5                        # m
@@ -28,7 +29,8 @@ class Ship(object):
         self.panel = panel
         self.center_x = panel.get_rect().width / 2
         self.center_y = panel.get_rect().height / 2
-        self.image = pygame.image.load('images/ship.png').convert()
+        self.image = pygame.image.load('images/A5.png').convert()
+        self.image = pygame.transform.rotozoom(self.image, 0, self.SCALE_FACTOR)
         self.rect = self.image.get_rect()
         
         self.fuel_mass = self.STARTING_FUEL_MASS
