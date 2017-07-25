@@ -35,7 +35,13 @@ class Ship(object):
         
         self.fuel_mass = self.STARTING_FUEL_MASS
         self.engine_on = False
-        self.flame = Flame(self.panel, 0, 35)
+        self.left_thruster_on = False
+        self.right_thruster_on = False
+        self.main_flame = Flame(self.panel, 0, 35)
+        self.left_rear_flame = Flame(self.panel, -35, 15, math.pi / 2, 0.18)
+        self.right_rear_flame = Flame(self.panel, 35, 15, -math.pi / 2, 0.18)
+        self.left_front_flame = Flame(self.panel, -10, -15, math.pi / 2, 0.12)
+        self.right_front_flame = Flame(self.panel, 10, -15, -math.pi / 2, 0.12)
 
         self.velocity_x, self.velocity_y = 0, 0
         self.position_x, self.position_y = position
@@ -67,7 +73,11 @@ class Ship(object):
         self.position_x += self.velocity_x * settings.tick_size
         self.position_y += self.velocity_y * settings.tick_size
 
-        self.flame.update(self.engine_on)
+        self.main_flame.update(self.engine_on)
+        self.left_rear_flame.update(self.left_thruster_on)
+        self.right_front_flame.update(self.left_thruster_on)
+        self.right_rear_flame.update(self.right_thruster_on)
+        self.left_front_flame.update(self.right_thruster_on)
     
     def _handle_keyboard_input(self):
         pressed_keys = pygame.key.get_pressed()
@@ -87,6 +97,8 @@ class Ship(object):
             self.velocity_x -= acceleration * math.sin(self.position_angular)
             self.fuel_mass -= self.THRUST_FUEL_RATE * settings.tick_size
         self.engine_on = pressed_keys[pygame.K_UP] and self.fuel_mass > 0
+        self.left_thruster_on = pressed_keys[pygame.K_LEFT] and self.fuel_mass > 0
+        self.right_thruster_on = pressed_keys[pygame.K_RIGHT] and self.fuel_mass > 0
     
     def draw(self, camera_position):
         camera_x, camera_y = camera_position
@@ -102,17 +114,20 @@ class Ship(object):
         rotated_rect.center = (self.position_x - camera_x, self.position_y - camera_y)
         
         self.panel.blit(rotated_image, rotated_rect)
-        self.flame.draw(rotated_rect.center, self.position_angular)
+        self.main_flame.draw(rotated_rect.center, self.position_angular)
+        self.left_rear_flame.draw(rotated_rect.center, self.position_angular)
+        self.right_rear_flame.draw(rotated_rect.center, self.position_angular)
+        self.left_front_flame.draw(rotated_rect.center, self.position_angular)
+        self.right_front_flame.draw(rotated_rect.center, self.position_angular)
 
 
 class Flame(object):
-    SCALE_FACTOR = 0.4
-
-    def __init__(self, panel, offset_x, offset_y, offset_angle=math.pi):
+    def __init__(self, panel, offset_x, offset_y, offset_angle=math.pi, scale_factor=0.4):
         self.panel = panel
         self.offset_x = offset_x
         self.offset_y = offset_y
         self.offset_angle = offset_angle
+        self.scale_factor = scale_factor
         self.images = [self._load_image(i) for i in range(1, 31)]
         self.current_index = None
 
@@ -133,7 +148,7 @@ class Flame(object):
     def _load_image(self, ndx):
         filename = 'images/blue_flame/{0:04}.png'.format(ndx)
         image = pygame.image.load(filename).convert()
-        return pygame.transform.rotozoom(image, 0, self.SCALE_FACTOR)
+        return pygame.transform.rotozoom(image, 0, self.scale_factor)
 
     def draw(self, center, angular_position):
         if not self.current_index:
@@ -143,7 +158,7 @@ class Flame(object):
         pos_x, pos_y = (center_x + self.offset_x * math.cos(angular_position)
                         + self.offset_y * math.sin(angular_position),
                         center_y + self.offset_y * math.cos(angular_position)
-                        + self.offset_x * math.sin(angular_position))
+                        - self.offset_x * math.sin(angular_position))
         angle = angular_position + self.offset_angle
         rotated_image = pygame.transform.rotozoom(self.images[self.current_index],
                                                   angle * RADIANS_TO_DEGREES,
