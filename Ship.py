@@ -47,11 +47,13 @@ class Ship(object):
         self.position_x, self.position_y = position
         self.velocity_angular = 0
         self.position_angular = position_angular / RADIANS_TO_DEGREES
-    
+
+    @property
     def status(self):
         speed = math.sqrt(self.velocity_x ** 2 + self.velocity_y ** 2) * settings.meters_per_pixel
         return speed, self.fuel_mass
-    
+
+    @property
     def camera_position(self):
         absolute_offset_x = abs(self.velocity_x) ** .6 * .5
         offset_x = math.copysign(absolute_offset_x, self.velocity_x)
@@ -61,7 +63,8 @@ class Ship(object):
         
         return [offset_x - self.center_x + self.position_x,
                 offset_y - self.center_y + self.position_y]
-    
+
+    @property
     def position(self):
         return self.position_x, self.position_y
     
@@ -69,9 +72,9 @@ class Ship(object):
         self._handle_keyboard_input()
 
         mass = self.DRY_MASS + self.fuel_mass
-        force = self.main_engine.get_force()
+        force = self.main_engine.force
         acceleration = force / mass / settings.meters_per_pixel * settings.tick_size
-        torque = self.left_engine.get_torque() - self.right_engine.get_torque()
+        torque = self.left_engine.torque - self.right_engine.torque
         acceleration_angular = torque / (mass * self.ROTATE_INERTIA_FACTOR) * settings.tick_size
 
         self.velocity_angular += acceleration_angular
@@ -134,7 +137,8 @@ class Engine(object):
                 self.power -= 1
         return self.power / self.MAX_POWER * self.fuel_rate * settings.tick_size
 
-    def _get_image_index(self):
+    @property
+    def image_index(self):
         if self.engine_on:
             if self.power < self.MAX_POWER:
                 return self.power
@@ -152,12 +156,12 @@ class MainEngine(Engine):
         self.full_force = self.fuel_rate * self.exhaust_velocity
         self.flame = Flame(panel, 0, offset_y, scale_factor=scale_factor)
 
-    def get_force(self):
+    @property
+    def force(self):
         return self.full_force * self.power / self.MAX_POWER
 
     def draw(self, center, angular_position):
-        index = self._get_image_index()
-        self.flame.draw(center, angular_position, index)
+        self.flame.draw(center, angular_position, self.image_index)
 
 
 class RotationEngine(Engine):
@@ -169,13 +173,13 @@ class RotationEngine(Engine):
         self.fore_flame = Flame(panel, *fore_offset, direction * math.pi / 2, scale_factor)
         self.aft_flame = Flame(panel, *aft_offset, -direction * math.pi / 2, scale_factor)
 
-    def get_torque(self):
+    @property
+    def torque(self):
         return self.full_torque * self.power / self.MAX_POWER
 
     def draw(self, center, angular_position):
-        index = self._get_image_index()
-        self.fore_flame.draw(center, angular_position, index)
-        self.aft_flame.draw(center, angular_position, index)
+        self.fore_flame.draw(center, angular_position, self.image_index)
+        self.aft_flame.draw(center, angular_position, self.image_index)
 
 
 class Flame(object):

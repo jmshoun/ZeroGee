@@ -22,6 +22,7 @@ class Course(object):
         self.num_gates = len(self.gate_sequence)
         self.current_gate = self.gate_sequence[self.current_gate_index]
 
+    @property
     def bounding_box(self):
         min_x = min([gate.position_x for gate in self.gates])
         max_x = max([gate.position_x for gate in self.gates])
@@ -43,6 +44,7 @@ class Course(object):
             self.finish_box.locked = False
         self.finish_box.update(ship_position)
 
+    @property
     def status(self):
         return self.current_gate_index, self.num_gates
     

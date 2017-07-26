@@ -59,7 +59,7 @@ class Level(object):
 
         self.hud = HUD.HUD(self.hud_panel.surface)
         self.minimap = MiniMap.MiniMap(self.minimap_panel.surface, self.course, self.ship)
-        self.camera_position = self.ship.camera_position()
+        self.camera_position = self.ship.camera_position
     
     def update(self):
         self.level_splash.update()
@@ -69,7 +69,7 @@ class Level(object):
             self._update_set()
         elif self.status is STATUS_GO:
             self._update_go()
-        self.hud.update(self.current_time, self.course.status(), self.ship.status())
+        self.hud.update(self.current_time, self.course.status, self.ship.status)
     
     def _update_ready(self):
         pressed_keys = pygame.key.get_pressed()
@@ -95,9 +95,9 @@ class Level(object):
             self.current_time = (pygame.time.get_ticks() - self.start_time) / 1000
         
         self.ship.update()
-        self.camera_position = self.ship.camera_position()
+        self.camera_position = self.ship.camera_position
         
-        self.course.update(self.ship.position())
+        self.course.update(self.ship.position)
         if self.course.finish_box.finished:
             self.status = STATUS_FINISHED
             self.level_splash = LevelSplash(self.screen, "Finished", (255,  0, 255), 5)

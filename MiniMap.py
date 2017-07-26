@@ -15,7 +15,7 @@ class MiniMap(object):
         self.course = course
         self.ship = ship
 
-        min_x, max_x, min_y, max_y = self.course.bounding_box()
+        min_x, max_x, min_y, max_y = self.course.bounding_box
         x_range, y_range = max_x - min_x, max_y - min_y
         panel_px_x, panel_px_y = self.panel.get_size()
 
