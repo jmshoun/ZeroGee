@@ -6,9 +6,9 @@ ZeroGee is a space racing game built around 2D inertial physics. Depending on yo
 
 ZeroGee is developed in Python 3.6 on Linux, but it should run fine on other platforms, provided that you have the right packages installed. You can install the dependencies and launch the game from the command line as follows:
 
-`pip install pygame`
-`pip install pyyaml'
-'ZeroGee levels/drag.yaml`
+    pip install pygame
+    pip install pyyaml
+    ZeroGee levels/drag.yaml
 
 The second argument to ZeroGee specifies the course to race on, since the in-game menus are nonexistent for the time being.
 
