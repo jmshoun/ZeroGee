@@ -8,9 +8,9 @@ ZeroGee is developed in Python 3.6 on Linux, but it should run fine on other pla
 
     pip install pygame
     pip install pyyaml
-    ZeroGee levels/drag.yaml
+    python ZeroGee.py levels/drag.yaml
 
-The second argument to ZeroGee specifies the course to race on, since the in-game menus are nonexistent for the time being.
+The argument to ZeroGee specifies the course to race on, since the in-game menus are nonexistent for the time being.
 
 ### Basic Gameplay
 
