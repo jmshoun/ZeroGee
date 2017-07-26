@@ -28,9 +28,12 @@ class FinishBox(object):
         self.color = START_COLOR
         pygame.draw.rect(self.image, (self.color, self.color, self.color), self.image_rect)
         self.timer = 0
+        self.locked = True
         self.finished = False
     
     def update(self, ship_position):
+        if self.locked:
+            return
         needs_drawing = False
         
         if self.location_rect.collidepoint(ship_position):

@@ -38,7 +38,9 @@ class Course(object):
             updated_status = gate.update(ship_position)
             if updated_status:
                 self._update_gate_status()
-        
+
+        if self.current_gate_index == len(self.gates):
+            self.finish_box.locked = False
         self.finish_box.update(ship_position)
 
     def status(self):
