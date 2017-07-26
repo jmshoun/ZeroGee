@@ -13,7 +13,7 @@ class Course(object):
 
         self.gates = [Gate.Gate.from_dict(panel, gate)
                       for gate in course_dict["gates"]]
-        self.gates[0].status = Gate.STATUS_NEXT
+        self.gates[0].status = Gate.Gate.STATUS_NEXT
         self.gate_sequence = course_dict["gate_sequence"]
         self.finish_box = FinishBox.FinishBox(panel, course_dict["finish_box"])
 
@@ -57,15 +57,15 @@ class Course(object):
     
     def _update_last_gate(self):
         if self.current_gate_index > 0:
-            self.gates[self.last_gate].status = Gate.STATUS_OTHER
+            self.gates[self.last_gate].status = Gate.Gate.STATUS_OTHER
     
     def _update_current_gate(self): 
-        self.gates[self.current_gate].status = Gate.STATUS_LAST
+        self.gates[self.current_gate].status = Gate.Gate.STATUS_LAST
     
     def _update_next_gate(self):
         if self.current_gate_index < len(self.gate_sequence):
             self.current_gate = self.gate_sequence[self.current_gate_index]
-            self.gates[self.current_gate].status = Gate.STATUS_NEXT
+            self.gates[self.current_gate].status = Gate.Gate.STATUS_NEXT
     
     def draw(self, camera_position):
         for gate in self.gates:

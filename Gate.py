@@ -9,12 +9,12 @@ import config
 settings = config.DisplaySettings()
 RADIANS_TO_DEGREES = 180 / math.pi
 
-STATUS_LAST = 0
-STATUS_NEXT = 1
-STATUS_OTHER = 2
-
 
 class Gate(object):
+    STATUS_LAST = 0
+    STATUS_NEXT = 1
+    STATUS_OTHER = 2
+
     def __init__(self, panel, position, angular_position, status=STATUS_OTHER):
         self.panel = panel
         
@@ -57,7 +57,8 @@ class Gate(object):
         
         side = ship_rotated_y - gate_rotated_y
         distance_from_center = abs(ship_rotated_x - gate_rotated_x)
-        if side * self.last_side < 0 and distance_from_center < 67 and self.status == STATUS_NEXT:
+        if (side * self.last_side < 0 and distance_from_center < 67
+                and self.status == self.STATUS_NEXT):
             status_updated = True
         self.last_side = side
         
