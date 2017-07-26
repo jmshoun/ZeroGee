@@ -1,2 +1,4 @@
 # Don't track compiled python
 __pycache__/
+# Ignore IDE files
+.idea/
