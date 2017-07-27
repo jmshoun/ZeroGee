@@ -24,14 +24,14 @@ class Course(object):
 
     @property
     def bounding_box(self):
-        min_x = min([gate.position_x for gate in self.gates])
-        max_x = max([gate.position_x for gate in self.gates])
-        min_y = min([gate.position_y for gate in self.gates])
-        max_y = max([gate.position_y for gate in self.gates])
-        min_x = min(min_x, self.finish_box.position_x)
-        max_x = max(max_x, self.finish_box.position_x)
-        min_y = min(min_y, self.finish_box.position_y)
-        max_y = max(max_y, self.finish_box.position_y)
+        min_x = min([gate.position.x for gate in self.gates])
+        max_x = max([gate.position.x for gate in self.gates])
+        min_y = min([gate.position.y for gate in self.gates])
+        max_y = max([gate.position.y for gate in self.gates])
+        min_x = min(min_x, self.finish_box.position.x)
+        max_x = max(max_x, self.finish_box.position.x)
+        min_y = min(min_y, self.finish_box.position.y)
+        max_y = max(max_y, self.finish_box.position.y)
         return min_x, max_x, min_y, max_y
     
     def update(self, ship_position):

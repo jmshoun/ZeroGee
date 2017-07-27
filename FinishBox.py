@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import pygame
+from pygame.math import Vector2
 
 import config
 
@@ -14,14 +15,12 @@ FINISH_COLOR = 255
 class FinishBox(object):
     def __init__(self, panel, position):
         self.panel = panel
-        
-        self.position_x, self.position_y = position
-        self.position_x = self.position_x / settings.meters_per_pixel
-        self.position_y = self.position_y / settings.meters_per_pixel
+
+        self.position = Vector2(position) / settings.meters_per_pixel
         self.image_rect = pygame.Rect(0, 0, BOX_SIZE / settings.meters_per_pixel,
                                       BOX_SIZE / settings.meters_per_pixel)
         self.location_rect = self.image_rect.copy()
-        self.location_rect.center = (self.position_x, self.position_y)
+        self.location_rect.center = self.position
         self.rect = self.image_rect.copy()
         self.image = pygame.Surface((self.image_rect.width, self.image_rect.height))
         
@@ -50,6 +49,5 @@ class FinishBox(object):
             pygame.draw.rect(self.image, (self.color, self.color, self.color), self.image_rect)
     
     def draw(self, camera_position):
-        camera_x, camera_y = camera_position
-        self.rect.center = (self.position_x - camera_x, self.position_y - camera_y)
+        self.rect.center = self.position - camera_position
         self.panel.blit(self.image, self.rect)

@@ -3,11 +3,11 @@
 import math
 
 import pygame
+from pygame.math import Vector2
 
 import config
 
 settings = config.DisplaySettings()
-RADIANS_TO_DEGREES = 180 / math.pi
 
 
 class Gate(object):
@@ -18,10 +18,8 @@ class Gate(object):
     def __init__(self, panel, position, angular_position, status=STATUS_OTHER):
         self.panel = panel
         
-        self.position_x, self.position_y = position
-        self.position_x = self.position_x / settings.meters_per_pixel
-        self.position_y = self.position_y / settings.meters_per_pixel
-        self.angular_position = angular_position / RADIANS_TO_DEGREES
+        self.position = Vector2(position) / settings.meters_per_pixel
+        self.angular_position = angular_position
         
         self.images = [self._init_image('gate-last'), self._init_image('gate-next'),
                        self._init_image('gate-other')]
@@ -37,26 +35,16 @@ class Gate(object):
     def _init_image(self, image_name):
         image = pygame.image.load('images/' + image_name + '.png')
         image.convert()
-        image = pygame.transform.rotozoom(image, self.angular_position * RADIANS_TO_DEGREES,
+        image = pygame.transform.rotozoom(image, self.angular_position,
                                           settings.scale_factor)
-        
         return image
     
     def update(self, ship_position):
         status_updated = False
-        ship_x, ship_y = ship_position
-        
-        ship_rotated_x = ship_x * math.cos(self.angular_position) - \
-                ship_y * math.sin(self.angular_position)
-        ship_rotated_y = ship_x * math.sin(self.angular_position) + \
-                ship_y * math.cos(self.angular_position)
-        gate_rotated_x = self.position_x * math.cos(self.angular_position) - \
-                self.position_y * math.sin(self.angular_position)
-        gate_rotated_y = self.position_x * math.sin(self.angular_position) + \
-                self.position_y * math.cos(self.angular_position)
-        
-        side = ship_rotated_y - gate_rotated_y
-        distance_from_center = abs(ship_rotated_x - gate_rotated_x)
+        ship_position_rotated = ship_position.rotate(self.angular_position)
+        gate_position_rotated = self.position.rotate(self.angular_position)
+        side = ship_position_rotated.y - gate_position_rotated.y
+        distance_from_center = abs(ship_position_rotated.x - gate_position_rotated.x)
         if (side * self.last_side < 0 and distance_from_center < 67
                 and self.status == self.STATUS_NEXT):
             status_updated = True
@@ -65,6 +53,5 @@ class Gate(object):
         return status_updated
     
     def draw(self, camera_position):
-        camera_x, camera_y = camera_position
-        self.rect.center = (self.position_x - camera_x, self.position_y - camera_y)
+        self.rect.center = self.position - camera_position
         self.panel.blit(self.images[self.status], self.rect)
