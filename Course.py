@@ -11,34 +11,49 @@ class Course(object):
         with open(course_path) as course_file:
             course_dict = yaml.load(course_file.read())
 
-        self.gates = [Gate.Gate.from_dict(panel, gate)
-                      for gate in course_dict["gates"]]
-        self.gates[0].status = Gate.Gate.STATUS_NEXT
-        self.gate_sequence = course_dict["gate_sequence"]
+        if "gates" in course_dict.keys():
+            self.gates = [Gate.Gate.from_dict(panel, gate)
+                          for gate in course_dict["gates"]]
+            self.gates[0].status = Gate.Gate.STATUS_NEXT
+            self.gate_sequence = course_dict["gate_sequence"]
+        else:
+            self.gates = []
+            self.gate_sequence = []
+        if "proxies" in course_dict.keys():
+            self.proxies = [Gate.Proxy.from_dict(panel, proxy)
+                            for proxy in course_dict["proxies"]]
+        else:
+            self.proxies = []
         self.finish_box = FinishBox.FinishBox(panel, course_dict["finish_box"])
 
         self.current_gate_index = 0
         self.last_gate = 0
         self.num_gates = len(self.gate_sequence)
-        self.current_gate = self.gate_sequence[self.current_gate_index]
+        if self.num_gates:
+            self.current_gate = self.gate_sequence[self.current_gate_index]
 
     @property
     def bounding_box(self):
-        min_x = min([gate.position.x for gate in self.gates])
-        max_x = max([gate.position.x for gate in self.gates])
-        min_y = min([gate.position.y for gate in self.gates])
-        max_y = max([gate.position.y for gate in self.gates])
-        min_x = min(min_x, self.finish_box.position.x)
-        max_x = max(max_x, self.finish_box.position.x)
-        min_y = min(min_y, self.finish_box.position.y)
-        max_y = max(max_y, self.finish_box.position.y)
-        return min_x, max_x, min_y, max_y
+        return (self._extremum(min, "x"), self._extremum(max, "x"),
+                self._extremum(min, "y"), self._extremum(max, "y"))
+
+    def _extremum(self, func, member):
+        extreme = getattr(self.finish_box.position, member)
+        if len(self.gates):
+            extreme_gate = func([getattr(gate.position, member) for gate in self.gates])
+            extreme = func(extreme, extreme_gate)
+        if len(self.proxies):
+            extreme_proxy = func([getattr(proxy.position, member) for proxy in self.proxies])
+            extreme = func(extreme, extreme_proxy)
+        return extreme
     
     def update(self, ship_position):
         for gate in self.gates:
             updated_status = gate.update(ship_position)
             if updated_status:
                 self._update_gate_status()
+        for proxy in self.proxies:
+            proxy.update(ship_position)
 
         if self.current_gate_index == len(self.gates):
             self.finish_box.locked = False
@@ -72,4 +87,6 @@ class Course(object):
     def draw(self, camera_position):
         for gate in self.gates:
             gate.draw(camera_position)
+        for proxy in self.proxies:
+            proxy.draw(camera_position)
         self.finish_box.draw(camera_position)

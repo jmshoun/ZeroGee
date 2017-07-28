@@ -5,8 +5,10 @@ from pygame.math import Vector2
 class MiniMap(object):
     PANEL_MARGIN_PX = 10
     GATE_COLOR = (100, 200, 100)
+    PROXY_COLOR = (200, 100, 100)
     FINISH_BOX_COLOR = (200, 100, 200)
     SHIP_COLOR = (100, 100, 255)
+    PROXY_RADIUS = 1
     GATE_RADIUS = 2
     SHIP_RADIUS = 3
     FINISH_BOX_SIZE = 4
@@ -29,12 +31,18 @@ class MiniMap(object):
     def draw(self):
         for gate in self.course.gates:
             self._draw_gate(gate)
+        for proxy in self.course.proxies:
+            self._draw_proxy(proxy)
         self._draw_finish_box()
         self._draw_ship()
 
     def _draw_gate(self, gate):
         position = self._position_to_pixels(gate.position)
         pygame.draw.circle(self.panel, self.GATE_COLOR, position, self.GATE_RADIUS)
+
+    def _draw_proxy(self, proxy):
+        position = self._position_to_pixels(proxy.position)
+        pygame.draw.circle(self.panel, self.PROXY_COLOR, position, self.PROXY_RADIUS)
 
     def _draw_finish_box(self):
         position = self._position_to_pixels(self.course.finish_box.position)
