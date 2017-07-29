@@ -29,6 +29,8 @@ class Course(object):
         self.current_gate_index = 0
         self.last_gate = 0
         self.num_gates = len(self.gate_sequence)
+        self.num_proxies = len(self.proxies)
+        self.proxies_left = self.num_proxies
         if self.num_gates:
             self.current_gate = self.gate_sequence[self.current_gate_index]
 
@@ -53,9 +55,10 @@ class Course(object):
             if updated_status:
                 self._update_gate_status()
         for proxy in self.proxies:
-            proxy.update(ship_position)
+            if proxy.update(ship_position):
+                self.proxies_left -= 1
 
-        if self.current_gate_index == len(self.gates):
+        if self.current_gate_index == len(self.gates) and self.proxies_left == 0:
             self.finish_box.locked = False
         self.finish_box.update(ship_position)
 
