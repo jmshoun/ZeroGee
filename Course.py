@@ -2,7 +2,7 @@
 
 import yaml
 
-import Gate
+import waypoint
 import FinishBox
 
 
@@ -60,7 +60,7 @@ class Course(object):
 
 class ProxySet(object):
     def __init__(self, panel, proxies):
-        self.proxies = [Gate.Proxy.from_dict(panel, proxy) for proxy in proxies]
+        self.proxies = [waypoint.Proxy.from_dict(panel, proxy) for proxy in proxies]
         self.num_proxies = len(self.proxies)
         self.proxies_completed = 0
 
@@ -80,14 +80,14 @@ class ProxySet(object):
 
 class GateSet(object):
     def __init__(self, panel, gates, gate_sequence):
-        self.gates = [Gate.Gate.from_dict(panel, gate) for gate in gates]
+        self.gates = [waypoint.Gate.from_dict(panel, gate) for gate in gates]
         self.gate_sequence = gate_sequence
         self.num_gates = len(self.gate_sequence)
         self.current_gate_index = 0
         if self.gates:
             self.current_gate = self.gate_sequence[self.current_gate_index]
             self.last_gate = self.current_gate
-            self.gates[self.current_gate].status = Gate.Gate.STATUS_NEXT
+            self.gates[self.current_gate].status = waypoint.Gate.STATUS_NEXT
 
     def update(self, ship_position):
         if not self.gates:
@@ -100,9 +100,9 @@ class GateSet(object):
 
     def _update_last_gate(self):
         if self.current_gate_index > 0:
-            self.gates[self.last_gate].status = Gate.Gate.STATUS_OTHER
+            self.gates[self.last_gate].status = waypoint.Gate.STATUS_OTHER
         self.last_gate = self.current_gate
-        self.gates[self.last_gate].status = Gate.Gate.STATUS_LAST
+        self.gates[self.last_gate].status = waypoint.Gate.STATUS_LAST
 
     def _update_current_gate(self):
         self.current_gate_index += 1
@@ -111,7 +111,7 @@ class GateSet(object):
 
     def _update_next_gate(self):
         if not self.is_complete:
-            self.gates[self.current_gate].status = Gate.Gate.STATUS_NEXT
+            self.gates[self.current_gate].status = waypoint.Gate.STATUS_NEXT
 
     def draw(self, camera_position):
         for gate in self.gates:
