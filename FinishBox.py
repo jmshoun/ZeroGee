@@ -16,10 +16,10 @@ class FinishBox(object):
     def __init__(self, panel, position):
         self.panel = panel
 
-        self.position = Vector2(position) / settings.meters_per_pixel
+        self.position = Vector2(position)
         self.image_rect = pygame.Rect(0, 0, BOX_SIZE / settings.meters_per_pixel,
                                       BOX_SIZE / settings.meters_per_pixel)
-        self.location_rect = self.image_rect.copy()
+        self.location_rect = pygame.Rect(0, 0, BOX_SIZE, BOX_SIZE)
         self.location_rect.center = self.position
         self.rect = self.image_rect.copy()
         self.image = pygame.Surface((self.image_rect.width, self.image_rect.height))
@@ -49,5 +49,5 @@ class FinishBox(object):
             pygame.draw.rect(self.image, (self.color, self.color, self.color), self.image_rect)
     
     def draw(self, camera_position):
-        self.rect.center = self.position - camera_position
+        self.rect.center = (self.position - camera_position) / settings.meters_per_pixel
         self.panel.blit(self.image, self.rect)

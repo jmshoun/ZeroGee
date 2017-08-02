@@ -28,10 +28,11 @@ class Ship(object):
     
     FORCE = EXHAUST_VELOCITY * THRUST_FUEL_RATE
     TORQUE = EXHAUST_VELOCITY * ROTATE_FUEL_RATE * ROTATE_THRUSTER_POSITION
+    OFFSET_STRENGTH = 0.2
     
     def __init__(self, panel, position, position_angular):
         self.panel = panel
-        self.center = Vector2(panel.get_rect().center)
+        self.center = Vector2(panel.get_rect().center) * settings.meters_per_pixel
         self.image = pygame.image.load('images/A5.png').convert()
         self.image = pygame.transform.rotozoom(self.image, -90, self.SCALE_FACTOR)
         
@@ -53,21 +54,23 @@ class Ship(object):
 
     @property
     def status(self):
-        speed = self.velocity.length() * settings.meters_per_pixel
+        speed = self.velocity.length()
         return speed, self.fuel_mass
 
     @property
     def camera_position(self):
+        """Camera position is the coordinate (measured in meters) of the top-left corner of the
+        main panel of the display."""
         offset = Vector2(math.copysign(abs(self.velocity.x ** 0.6), self.velocity.x),
-                         math.copysign(abs(self.velocity.y ** 0.6), self.velocity.y)) * 0.5
-        return offset - self.center + self.position
+                         math.copysign(abs(self.velocity.y ** 0.6), self.velocity.y))
+        return self.position - self.center + offset * self.OFFSET_STRENGTH
     
     def update(self):
         self._handle_keyboard_input()
 
         mass = self.DRY_MASS + self.fuel_mass
         force = self.main_engine.force
-        acceleration_magnitude = force / mass / settings.meters_per_pixel * settings.tick_size
+        acceleration_magnitude = force / mass * settings.tick_size
         torque = self.left_engine.torque - self.right_engine.torque
         acceleration_angular = (torque / (mass * self.ROTATE_INERTIA_FACTOR) * settings.tick_size
                                 * RADIANS_TO_DEGREES)
@@ -94,7 +97,7 @@ class Ship(object):
         tmp_rect = rotated_image.get_rect()
         rotated_rect = self.rect.inflate(tmp_rect.width - self.rect.width,
                                          tmp_rect.height - self.rect.height)
-        rotated_rect.center = self.position - camera_position
+        rotated_rect.center = (self.position - camera_position) / settings.meters_per_pixel
         
         self.panel.blit(rotated_image, rotated_rect)
         ship_center = Vector2(rotated_rect.center)

@@ -5,5 +5,5 @@ display:
   scale_factor: 0.75
 starfield:
   num_stars: [400, 200, 100]
-  parallax_rate: [0.20, 0.12, 0.06]
+  parallax_rate: [1.2, 0.8, 0.4]
   luminosity: [100, 70, 40]
