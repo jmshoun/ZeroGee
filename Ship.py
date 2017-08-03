@@ -26,7 +26,7 @@ class Ship(object):
     THRUST_FUEL_RATE = 4.0              # kg/sec
     ROTATE_FUEL_RATE = 0.5              # kg/sec
 
-    OFFSET_STRENGTH = 0.2
+    CAMERA_OFFSET_STRENGTH = 0.2
     
     def __init__(self, panel, position, position_angular):
         self.panel = panel
@@ -64,7 +64,7 @@ class Ship(object):
         main panel of the display."""
         offset = Vector2(math.copysign(abs(self.velocity.x ** 0.6), self.velocity.x),
                          math.copysign(abs(self.velocity.y ** 0.6), self.velocity.y))
-        return self.position - self.center + offset * self.OFFSET_STRENGTH
+        return self.position - self.center + offset * self.CAMERA_OFFSET_STRENGTH
 
     @property
     def mass(self):
