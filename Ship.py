@@ -25,9 +25,7 @@ class Ship(object):
     EXHAUST_VELOCITY = 1040.0           # m/sec
     THRUST_FUEL_RATE = 4.0              # kg/sec
     ROTATE_FUEL_RATE = 0.8              # kg/sec
-    
-    FORCE = EXHAUST_VELOCITY * THRUST_FUEL_RATE
-    TORQUE = EXHAUST_VELOCITY * ROTATE_FUEL_RATE * ROTATE_THRUSTER_POSITION
+
     OFFSET_STRENGTH = 0.2
     
     def __init__(self, panel, position, position_angular):
@@ -37,11 +35,14 @@ class Ship(object):
         self.image = pygame.transform.rotozoom(self.image, -90, self.SCALE_FACTOR)
         
         self.fuel_mass = self.STARTING_FUEL_MASS
-        self.main_engine = MainEngine(self.panel, 4.0, 1040.0, -35, 0.4)
-        self.left_engine = RotationEngine(self.panel, 0.8, 1040.0, 2.0,
-                                          Vector2(15, 10), Vector2(-15, -35), 0.12, LEFT)
-        self.right_engine = RotationEngine(self.panel, 0.8, 1040.0, 2.0,
-                                           Vector2(15, -10), Vector2(-15, 35), 0.12, RIGHT)
+        self.main_engine = MainEngine(self.panel, self.THRUST_FUEL_RATE,
+                                      self.EXHAUST_VELOCITY, -35, 0.4)
+        self.left_engine = RotationEngine(self.panel, self.ROTATE_FUEL_RATE, self.EXHAUST_VELOCITY,
+                                          self.ROTATE_THRUSTER_POSITION, Vector2(15, 10),
+                                          Vector2(-15, -35), 0.12, LEFT)
+        self.right_engine = RotationEngine(self.panel, self.ROTATE_FUEL_RATE, self.EXHAUST_VELOCITY,
+                                           self.ROTATE_THRUSTER_POSITION, Vector2(15, -10),
+                                           Vector2(-15, 35), 0.12, RIGHT)
 
         self.velocity = Vector2(0, 0)
         self.position = Vector2(position)
