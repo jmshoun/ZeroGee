@@ -22,9 +22,9 @@ class Ship(object):
     ROTATE_THRUSTER_POSITION = 2.0      # m outboard from center of mass
     ROTATE_INERTIA_FACTOR = LENGTH ** 2 / (ROTATE_THRUSTER_POSITION * 12)
 
-    EXHAUST_VELOCITY = 1040.0           # m/sec
+    EXHAUST_VELOCITY = 1860.0           # m/sec
     THRUST_FUEL_RATE = 4.0              # kg/sec
-    ROTATE_FUEL_RATE = 0.8              # kg/sec
+    ROTATE_FUEL_RATE = 0.5              # kg/sec
 
     OFFSET_STRENGTH = 0.2
     
@@ -34,7 +34,7 @@ class Ship(object):
         self.image = pygame.image.load('images/A5.png').convert()
         self.image = pygame.transform.rotozoom(self.image, -90, self.SCALE_FACTOR)
         
-        self.fuel_mass = self.STARTING_FUEL_MASS
+        self.fuel_tank = FuelTank(10, 200, fuel_mass=200)
         self.main_engine = MainEngine(self.panel, self.THRUST_FUEL_RATE,
                                       self.EXHAUST_VELOCITY, -35, 0.4)
         self.left_engine = RotationEngine(self.panel, self.ROTATE_FUEL_RATE, self.EXHAUST_VELOCITY,
@@ -56,7 +56,7 @@ class Ship(object):
     @property
     def status(self):
         speed = self.velocity.length()
-        return speed, self.fuel_mass
+        return speed, self.fuel_tank.fuel_mass
 
     @property
     def camera_position(self):
@@ -65,16 +65,19 @@ class Ship(object):
         offset = Vector2(math.copysign(abs(self.velocity.x ** 0.6), self.velocity.x),
                          math.copysign(abs(self.velocity.y ** 0.6), self.velocity.y))
         return self.position - self.center + offset * self.OFFSET_STRENGTH
+
+    @property
+    def mass(self):
+        return self.DRY_MASS + self.fuel_tank.mass
     
     def update(self):
         self._handle_keyboard_input()
 
-        mass = self.DRY_MASS + self.fuel_mass
-        force = self.main_engine.force
-        acceleration_magnitude = force / mass * settings.tick_size
-        torque = self.left_engine.torque - self.right_engine.torque
-        acceleration_angular = (torque / (mass * self.ROTATE_INERTIA_FACTOR) * settings.tick_size
-                                * RADIANS_TO_DEGREES)
+        force = self.main_engine.force * self.fuel_tank.efficiency
+        acceleration_magnitude = force / self.mass * settings.tick_size
+        torque = (self.left_engine.torque - self.right_engine.torque) * self.fuel_tank.efficiency
+        acceleration_angular = (torque / (self.mass * self.ROTATE_INERTIA_FACTOR)
+                                * settings.tick_size * RADIANS_TO_DEGREES)
 
         self.velocity_angular += acceleration_angular
         self.position_angular += self.velocity_angular * settings.tick_size
@@ -85,11 +88,18 @@ class Ship(object):
         self.position += self.velocity * settings.tick_size
     
     def _handle_keyboard_input(self):
-        pressed_keys = pygame.key.get_pressed()
-        fuel_left = self.fuel_mass > 0
-        self.fuel_mass -= self.main_engine.update(fuel_left and pressed_keys[pygame.K_UP])
-        self.fuel_mass -= self.left_engine.update(fuel_left and pressed_keys[pygame.K_LEFT])
-        self.fuel_mass -= self.right_engine.update(fuel_left and pressed_keys[pygame.K_RIGHT])
+        burn_mass = 0
+        if not self.fuel_tank.is_empty:
+            pressed_keys = pygame.key.get_pressed()
+            burn_mass += self.main_engine.update(pressed_keys[pygame.K_UP])
+            burn_mass += self.left_engine.update(pressed_keys[pygame.K_LEFT])
+            burn_mass += self.right_engine.update(pressed_keys[pygame.K_RIGHT])
+        else:
+            # Always update the engines so the flames will decay when fuel is exhausted.
+            self.main_engine.update(False)
+            self.left_engine.update(False)
+            self.right_engine.update(False)
+        self.fuel_tank.update(burn_mass)
     
     def draw(self, camera_position):
         rotated_image = pygame.transform.rotozoom(self.image, self.position_angular,
@@ -204,3 +214,63 @@ class Flame(object):
         rotated_rect = rotated_image.get_rect()
         rotated_rect.center = position
         self.panel.blit(rotated_image, rotated_rect)
+
+
+class Fuel(object):
+    def __init__(self, name, exhaust_velocity, density):
+        self.name = name
+        self.exhaust_velocity = exhaust_velocity
+        self.density = density
+
+
+FUELS = {
+    "Hydrogen Peroxide": Fuel("Hydrogen Peroxide", 1860, 1.40),
+    "HydroBeryllox": Fuel("HydroBeryllox", 5295, 0.24),
+    "HydroFlouro": Fuel("HydroFlouro", 4697, 0.52),
+    "Kerolox": Fuel("Kerolox", 3510, 1.03),
+    "ChloroFlouro": Fuel("ChloroFlouro", 3356, 1.50)
+}
+
+
+def clamp(x, clamp_range):
+    """Returns the value inside clamp_range that is closest to x."""
+    clamp_min, clamp_max = clamp_range
+    return clamp_min if x < clamp_min else clamp_max if x > clamp_max else x
+
+
+class FuelTank(object):
+    FULL_PRESSURE = 690  # KPa
+    GAMMA = 1.22  # unitless
+
+    def __init__(self, dry_mass, volume, fuel_name="Hydrogen Peroxide", fuel_mass=0):
+        self.dry_mass = dry_mass
+        self.volume = volume
+        self.fuel = FUELS[fuel_name]
+        self.fuel_mass = clamp(fuel_mass, (0, self.max_fuel_mass))
+        self.max_efficiency_coefficient = self.efficiency_coefficient(self.max_fuel_mass)
+
+    @property
+    def is_empty(self):
+        return self.fuel_mass <= 0
+
+    @property
+    def mass(self):
+        return self.dry_mass + self.fuel_mass
+
+    @property
+    def max_fuel_mass(self):
+        return self.volume * self.fuel.density
+
+    def update(self, burn_mass):
+        self.fuel_mass = max(self.fuel_mass - burn_mass, 0)
+
+    def efficiency_coefficient(self, fuel_mass):
+        if fuel_mass <= 0:
+            return 0
+        pressure = self.FULL_PRESSURE * fuel_mass / self.max_fuel_mass
+        pressure_term = (1 / pressure) ** ((self.GAMMA - 1) / self.GAMMA)
+        return math.sqrt(1 - pressure_term) if pressure_term < 1 else 0
+
+    @property
+    def efficiency(self):
+        return self.efficiency_coefficient(self.fuel_mass) / self.max_efficiency_coefficient
