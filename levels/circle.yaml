@@ -1,27 +1,29 @@
 gates:
+  - position: [0, 0]
+    angle: 0
   - position: [50, 0]
-    angle: 90
+    angle: 0
   - position: [72.51, 9.32]
-    angle: 45
+    angle: -45
   - position: [81.83, 31.83]
-    angle: 0
+    angle: -90
   - position: [72.51, 54.34]
-    angle: -45
-  - position: [50, 63.66]
-    angle: 90
-  - position: [0, 63.66]
-    angle: 90
-  - position: [-50, 63.66]
-    angle: 90
-  - position: [-72.51, 54.34]
     angle: 45
-  - position: [-81.83, 31.83]
+  - position: [50, 63.66]
     angle: 0
-  - position: [-72.51, 9.32]
+  - position: [0, 63.66]
+    angle: 0
+  - position: [-50, 63.66]
+    angle: 0
+  - position: [-72.51, 54.34]
     angle: -45
+  - position: [-81.83, 31.83]
+    angle: 90
+  - position: [-72.51, 9.32]
+    angle: 45
   - position: [-50, 0]
-    angle: 90
+    angle: 0
   - position: [-20, 0]
-    angle: 90
+    angle: 0
 finish_box: [-12, 0]
-gate_sequence: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+gate_sequence: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]

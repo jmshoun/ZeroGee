@@ -1,21 +1,21 @@
 gates:
   - position: [0, 0]
-    angle: 90
+    angle: 0
   - position: [25, 0]
-    angle: 90
+    angle: 0
   - position: [75, 0]
-    angle: 90
+    angle: 0
   - position: [150, 0]
-    angle: 90
+    angle: 0
   - position: [250, 0]
-    angle: 90
+    angle: 0
   - position: [350, 0]
-    angle: 90
+    angle: 0
   - position: [425, 0]
-    angle: 90
+    angle: 0
   - position: [475, 0]
-    angle: 90
+    angle: 0
   - position: [500, 0]
-    angle: 90
+    angle: 0
 finish_box: [-12, 0]
 gate_sequence: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1, 0]

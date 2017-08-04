@@ -31,15 +31,15 @@ class Gate(object):
     def _init_image(self, image_name):
         image = pygame.image.load('images/' + image_name + '.png')
         image.convert()
-        image = pygame.transform.rotozoom(image, self.angular_position, settings.scale_factor)
+        image = pygame.transform.rotozoom(image, self.angular_position - 90, settings.scale_factor)
         return image
 
     def update(self, ship_position):
         status_updated = False
         ship_position_rotated = ship_position.rotate(self.angular_position)
         gate_position_rotated = self.position.rotate(self.angular_position)
-        side = ship_position_rotated.y - gate_position_rotated.y
-        distance_from_center = abs(ship_position_rotated.x - gate_position_rotated.x)
+        side = ship_position_rotated.x - gate_position_rotated.x
+        distance_from_center = abs(ship_position_rotated.y - gate_position_rotated.y)
         if (side * self.last_side < 0 and distance_from_center < 10
                 and self.status == self.STATUS_NEXT):
             status_updated = True
