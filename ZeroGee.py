@@ -5,7 +5,7 @@ import sys
 import pygame
 from pygame.locals import *
 
-import Level
+import level
 import config
 
 settings = config.DisplaySettings()
@@ -15,7 +15,7 @@ screen = pygame.display.set_mode(settings.screen_resolution, pygame.FULLSCREEN)
 pygame.display.set_caption('ZeroGee')
 
 clock = pygame.time.Clock()
-level = Level.Level(screen, sys.argv[1])
+level = level.Level(screen, sys.argv[1])
 
 
 def check_for_termination():

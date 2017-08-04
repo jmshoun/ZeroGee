@@ -3,7 +3,7 @@ from pygame.math import Vector2
 
 import waypoint
 import hazard
-import FinishBox
+import finishbox
 
 
 class Course(object):
@@ -17,7 +17,7 @@ class Course(object):
         self.proxy_set = ProxySet(panel, proxy_spec)
         gravity_zone_spec = course_dict.get("gravity_zones", [])
         self.gravity_zone_set = GravityZoneSet(panel, gravity_zone_spec)
-        self.finish_box = FinishBox.FinishBox(panel, course_dict["finish_box"])
+        self.finish_box = finishbox.FinishBox(panel, course_dict["finish_box"])
 
     @property
     def bounding_box(self):
