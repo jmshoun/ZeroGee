@@ -1,0 +1,26 @@
+gates:
+  - position: [0, 0]
+    angle: 90
+  - position: [50, 0]
+    angle: 90
+  - position: [150, 0]
+    angle: 90
+  - position: [200, 0]
+    angle: 90
+  - position: [200, 20]
+    angle: 90
+  - position: [150, 20]
+    angle: 90
+  - position: [50, 20]
+    angle: 90
+  - position: [0, 20]
+    angle: 90
+gate_sequence: [0, 1, 2, 3, 4, 5, 6, 7]
+gravity_zones:
+  - bounding_box: [60, -8, 140, 8]
+    strength: 5
+    direction: 0
+  - bounding_box: [60, 12, 140, 28]
+    strength: 5
+    direction: 180
+finish_box: [-12, 20]

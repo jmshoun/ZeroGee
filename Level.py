@@ -91,8 +91,9 @@ class Level(object):
     def _update_go(self):
         if self.course.finish_box.timer == 0:
             self.current_time = (pygame.time.get_ticks() - self.start_time) / 1000
-        
-        self.ship.update()
+
+        external_acceleration = self.course.acceleration(self.ship.position)
+        self.ship.update(external_acceleration)
         self.camera_position = self.ship.camera_position
         
         self.course.update(self.ship.position)

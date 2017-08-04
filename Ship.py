@@ -68,7 +68,7 @@ class Ship(object):
     def mass(self):
         return self.DRY_MASS + self.fuel_tank.mass
     
-    def update(self):
+    def update(self, external_acceleration):
         self._handle_keyboard_input()
 
         force = self.main_engine.force * self.fuel_tank.efficiency
@@ -80,8 +80,9 @@ class Ship(object):
         self.velocity_angular += acceleration_angular
         self.position_angular += self.velocity_angular * settings.tick_size
 
-        acceleration = Vector2()
-        acceleration.from_polar((acceleration_magnitude, -self.position_angular))
+        internal_acceleration = Vector2()
+        internal_acceleration.from_polar((acceleration_magnitude, -self.position_angular))
+        acceleration = external_acceleration + internal_acceleration
         self.velocity += acceleration
         self.position += self.velocity * settings.tick_size
     

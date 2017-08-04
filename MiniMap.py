@@ -7,6 +7,7 @@ class MiniMap(object):
     GATE_COLOR = (100, 200, 100)
     PROXY_COLOR = (200, 100, 100)
     FINISH_BOX_COLOR = (200, 100, 200)
+    GRAVITY_ZONE_COLOR = (50, 100, 50)
     SHIP_COLOR = (100, 100, 255)
     PROXY_RADIUS = 1
     GATE_RADIUS = 2
@@ -33,6 +34,8 @@ class MiniMap(object):
             self._draw_gate(gate)
         for proxy in self.course.proxies:
             self._draw_proxy(proxy)
+        for zone in self.course.gravity_zones:
+            self._draw_gravity_zone(zone)
         self._draw_finish_box()
         self._draw_ship()
 
@@ -43,6 +46,12 @@ class MiniMap(object):
     def _draw_proxy(self, proxy):
         position = self._position_to_pixels(proxy.position)
         pygame.draw.circle(self.panel, self.PROXY_COLOR, position, self.PROXY_RADIUS)
+
+    def _draw_gravity_zone(self, zone):
+        top_left = self._position_to_pixels(Vector2(zone.rect.topleft))
+        size = Vector2(zone.rect.size) / self.meters_per_pixel
+        rect = pygame.Rect(*top_left, size.x, size.y)
+        pygame.draw.rect(self.panel, self.GRAVITY_ZONE_COLOR, rect)
 
     def _draw_finish_box(self):
         position = self._position_to_pixels(self.course.finish_box.position)

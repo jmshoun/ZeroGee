@@ -1,6 +1,8 @@
 import yaml
+from pygame.math import Vector2
 
 import waypoint
+import hazard
 import FinishBox
 
 
@@ -13,6 +15,8 @@ class Course(object):
         self.gate_set = GateSet(panel, *gate_spec)
         proxy_spec = course_dict.get("proxies", [])
         self.proxy_set = ProxySet(panel, proxy_spec)
+        gravity_zone_spec = course_dict.get("gravity_zones", [])
+        self.gravity_zone_set = GravityZoneSet(panel, gravity_zone_spec)
         self.finish_box = FinishBox.FinishBox(panel, course_dict["finish_box"])
 
     @property
@@ -45,6 +49,7 @@ class Course(object):
     def draw(self, camera_position):
         self.gate_set.draw(camera_position)
         self.proxy_set.draw(camera_position)
+        self.gravity_zone_set.draw(camera_position)
         self.finish_box.draw(camera_position)
 
     @property
@@ -54,6 +59,13 @@ class Course(object):
     @property
     def proxies(self):
         return self.proxy_set.proxies
+
+    @property
+    def gravity_zones(self):
+        return self.gravity_zone_set.zones
+
+    def acceleration(self, ship_position):
+        return self.gravity_zone_set.acceleration(ship_position)
 
 
 class ProxySet(object):
@@ -118,3 +130,18 @@ class GateSet(object):
     @property
     def is_complete(self):
         return self.current_gate_index == len(self.gate_sequence)
+
+
+class GravityZoneSet(object):
+    def __init__(self, panel, gravity_zones):
+        self.zones = [hazard.GravityZone.from_dict(panel, zone) for zone in gravity_zones]
+
+    def draw(self, camera_position):
+        for zone in self.zones:
+            zone.draw(camera_position)
+
+    def acceleration(self, ship_position):
+        acceleration = Vector2()
+        for zone in self.zones:
+            acceleration += zone.current_acceleration(ship_position)
+        return acceleration
