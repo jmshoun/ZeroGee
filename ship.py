@@ -12,6 +12,12 @@ LEFT = 1
 RIGHT = -1
 
 
+def clamp(x, clamp_range):
+    """Returns the value inside clamp_range that is closest to x."""
+    clamp_min, clamp_max = clamp_range
+    return clamp_min if x < clamp_min else clamp_max if x > clamp_max else x
+
+
 class Ship(object):
     CAMERA_OFFSET_STRENGTH = 0.2
     # Placeholder values. All of these should be overriden, and in fact most of these values should
@@ -115,15 +121,24 @@ class Pegasus(Ship):
     DRY_MASS = 1000.0                   # kg
     LENGTH = 2.5                        # m
     ROTATE_THRUSTER_POSITION = 2.0      # m outboard from center of mass
-    PRIMARY_BURN_RATE = 4.0              # kg/sec
+    PRIMARY_BURN_RATE = 4.0             # kg/sec
+    PRIMARY_TANK_MASS = 10              # kg
+    PRIMARY_TANK_VOLUME = 200           # L
+
+    PARAMETER_LIMITS = {
+        "primary_fuel_mass": (0, 280),
+        "rotational_burn_rate": (0.15, 1.0)
+    }
 
     def __init__(self, panel, primary_fuel_mass, rotational_burn_rate):
         super().__init__(panel, "images/A5.png")
         self.primary_burn_rate = self.PRIMARY_BURN_RATE
-        self.rotational_burn_rate = rotational_burn_rate
+        self.rotational_burn_rate = clamp(rotational_burn_rate,
+                                          self.PARAMETER_LIMITS["rotational_burn_rate"])
 
         self.fuel_tanks = {
-            "primary": FuelTank(10, 200, fuel_mass=primary_fuel_mass)
+            "primary": FuelTank(self.PRIMARY_TANK_MASS, self.PRIMARY_TANK_VOLUME,
+                                fuel_mass=primary_fuel_mass)
         }
         exhaust_velocity = self.fuel_tanks["primary"].exhaust_velocity
 
@@ -265,12 +280,6 @@ FUELS = {
     "Kerolox": Fuel("Kerolox", 3510, 1.03),
     "ChloroFlouro": Fuel("ChloroFlouro", 3356, 1.50)
 }
-
-
-def clamp(x, clamp_range):
-    """Returns the value inside clamp_range that is closest to x."""
-    clamp_min, clamp_max = clamp_range
-    return clamp_min if x < clamp_min else clamp_max if x > clamp_max else x
 
 
 class FuelTank(object):
