@@ -49,7 +49,8 @@ class Level(object):
         self.hud_panel = Panel(screen.subsurface(pygame.Rect(*panel_sizes["hud_rect"])))
         self.minimap_panel = Panel(screen.subsurface(pygame.Rect(*panel_sizes["minimap_rect"])))
         
-        self.ship = Ship.Ship(self.main_panel.surface, (-0.1, 0), 0)
+        self.ship = Ship.Pegasus(self.main_panel.surface, 500, 0.5)
+        self.ship.set_position((-0.1, 0), 0)
         self.course = Course.Course(self.main_panel.surface, course_path)
 
         self.starfield = Starfield.Starfield(self.main_panel.surface)
