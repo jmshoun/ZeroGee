@@ -12,7 +12,7 @@ class GravityZone(object):
     HATCH_COLOR = (50, 20, 50)
     HATCH_WIDTH = 8
     HATCH_SPACING = 50
-    HATCH_SCALE = 4
+    HATCH_SCALE = 3
 
     def __init__(self, panel, bounding_box, strength, direction):
         self.panel = panel

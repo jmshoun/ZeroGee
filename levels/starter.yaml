@@ -1,0 +1,23 @@
+gates:
+  - position: [0, 0]
+    angle: 0
+  - position: [25, 0]
+    angle: 0
+  - position: [50, 0]
+    angle: 0
+  - position: [75, 0]
+    angle: 0
+  - position: [100, 0]
+    angle: 0
+finish_box: [115, 0]
+gate_sequence: [0, 1, 2, 3, 4]
+gravity_zones:
+  - bounding_box: [0, -15, 122, -6]
+    strength: 15
+    direction: 90
+  - bounding_box: [0, 6, 122, 15]
+    strength: 15
+    direction: -90
+  - bounding_box: [122, -15, 150, 15]
+    strength: 15
+    direction: 180
