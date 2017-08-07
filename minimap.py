@@ -18,18 +18,44 @@ class MiniMap(object):
         self.panel = panel
         self.course = course
         self.ship = ship
-
-        min_x, max_x, min_y, max_y = self.course.bounding_box
-        x_range, y_range = max_x - min_x, max_y - min_y
-        panel_size = Vector2(self.panel.get_size())
-
-        self.meters_per_pixel = max(x_range / (panel_size.x - 2 * self.PANEL_MARGIN_PX),
-                                    y_range / (panel_size.y - 2 * self.PANEL_MARGIN_PX))
         self.finish_box_size = Vector2(self.FINISH_BOX_SIZE, self.FINISH_BOX_SIZE)
-        center = Vector2(min_x + x_range / 2, min_y + y_range / 2)
-        self.origin = center - panel_size / 2 * self.meters_per_pixel
+        self.bounding_rect = self.course.bounding_rect
+        self.default_origin, self.default_meters_per_pixel = \
+            self.translation_factors(self.bounding_rect)
+        self.origin, self.meters_per_pixel = self.default_origin, self.default_meters_per_pixel
+
+    def translation_factors(self, bounding_rect):
+        width, height = bounding_rect.size
+        panel_size = Vector2(self.panel.get_size())
+        meters_per_pixel = max(width / (panel_size.x - 2 * self.PANEL_MARGIN_PX),
+                               height / (panel_size.y - 2 * self.PANEL_MARGIN_PX))
+        center = Vector2(bounding_rect.left + width / 2, bounding_rect.top + height / 2)
+        origin = center - panel_size / 2 * meters_per_pixel
+        return origin, meters_per_pixel
+
+    def inflate_bounding_box(self, ship_position):
+        rect = self.bounding_rect
+        if ship_position.x < rect.left:
+            rect = pygame.Rect(ship_position.x, rect.top, rect.right - ship_position.x, rect.height)
+        elif ship_position.x > rect.right:
+            rect = pygame.Rect(rect.left, rect.top, ship_position.x - rect.left, rect.height)
+        if ship_position.y < rect.top:
+            rect = pygame.Rect(rect.left, ship_position.y, rect.width,
+                               rect.bottom - ship_position.y)
+        elif ship_position.y > rect.bottom:
+            rect = pygame.Rect(rect.left, rect.top, rect.width, ship_position.y - rect.top)
+        return rect
+
+    def set_translation_factors(self):
+        if self.bounding_rect.collidepoint(*self.ship.position):
+            self.origin = self.default_origin
+            self.meters_per_pixel = self.default_meters_per_pixel
+        else:
+            bounding_box = self.inflate_bounding_box(self.ship.position)
+            self.origin, self.meters_per_pixel = self.translation_factors(bounding_box)
 
     def draw(self):
+        self.set_translation_factors()
         for gate in self.course.gates:
             self._draw_gate(gate)
         for proxy in self.course.proxies:

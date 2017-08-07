@@ -1,4 +1,5 @@
 import yaml
+import pygame
 from pygame.math import Vector2
 
 import waypoint
@@ -20,9 +21,10 @@ class Course(object):
         self.finish_box = finishbox.FinishBox(panel, course_dict["finish_box"])
 
     @property
-    def bounding_box(self):
-        return (self._extremum(min, "x"), self._extremum(max, "x"),
-                self._extremum(min, "y"), self._extremum(max, "y"))
+    def bounding_rect(self):
+        min_x, max_x, min_y, max_y = (self._extremum(min, "x"), self._extremum(max, "x"),
+                                      self._extremum(min, "y"), self._extremum(max, "y"))
+        return pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
 
     def _extremum(self, func, member):
         extreme = getattr(self.finish_box.position, member)

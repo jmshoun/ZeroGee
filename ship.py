@@ -45,7 +45,7 @@ class Ship(object):
         self.fuel_tanks = {}
 
     def set_position(self, position, position_angular):
-        self.position = position
+        self.position = Vector2(position)
         self.position_angular = position_angular
 
     def load_image(self, image_filename):
