@@ -4,7 +4,7 @@ import pygame
 from pygame.math import Vector2
 
 import config
-import engine
+import propulsion
 
 settings = config.DisplaySettings()
 RADIANS_TO_DEGREES = 180 / math.pi
@@ -138,20 +138,20 @@ class Pegasus(Ship):
                                           self.PARAMETER_LIMITS["rotational_burn_rate"])
 
         self.fuel_tanks = {
-            "primary": engine.FuelTank(self.PRIMARY_TANK_MASS, self.PRIMARY_TANK_VOLUME,
-                                       fuel_mass=primary_fuel_mass)
+            "primary": propulsion.FuelTank(self.PRIMARY_TANK_MASS, self.PRIMARY_TANK_VOLUME,
+                                           fuel_mass=primary_fuel_mass)
         }
         exhaust_velocity = self.fuel_tanks["primary"].exhaust_velocity
 
         self.engines = {
-            "main": engine.MainEngine(self.panel, self.primary_burn_rate,
-                                      exhaust_velocity, -35, 0.4),
-            "left": engine.RotationEngine(self.panel, self.rotational_burn_rate, exhaust_velocity,
-                                          self.ROTATE_THRUSTER_POSITION,
-                                          Vector2(15, 10), Vector2(-15, -35), 0.12, LEFT),
-            "right": engine.RotationEngine(self.panel, self.rotational_burn_rate, exhaust_velocity,
-                                           self.ROTATE_THRUSTER_POSITION,
-                                           Vector2(15, -10), Vector2(-15, 35), 0.12, RIGHT)
+            "main": propulsion.MainEngine(self.panel, self.primary_burn_rate,
+                                          exhaust_velocity, -35, 0.4),
+            "left": propulsion.RotationEngine(self.panel, self.rotational_burn_rate,
+                                              exhaust_velocity, self.ROTATE_THRUSTER_POSITION,
+                                              Vector2(15, 10), Vector2(-15, -35), 0.12, LEFT),
+            "right": propulsion.RotationEngine(self.panel, self.rotational_burn_rate,
+                                               exhaust_velocity, self.ROTATE_THRUSTER_POSITION,
+                                               Vector2(15, -10), Vector2(-15, 35), 0.12, RIGHT)
         }
 
     def _handle_keyboard_input(self):
@@ -192,26 +192,27 @@ class Manticore(Ship):
                                                self.PARAMETER_LIMITS["rotational_throttle_ratio"])
 
         self.fuel_tanks = {
-            "primary": engine.FuelTank(self.PRIMARY_TANK_MASS, self.PRIMARY_TANK_VOLUME,
-                                       "Kerolox", fuel_mass=primary_fuel_mass),
-            "secondary": engine.FuelTank(self.SECONDARY_TANK_MASS, self.SECONDARY_TANK_VOLUME,
-                                         fuel_mass=secondary_fuel_mass)
+            "primary": propulsion.FuelTank(self.PRIMARY_TANK_MASS, self.PRIMARY_TANK_VOLUME,
+                                           "Kerolox", fuel_mass=primary_fuel_mass),
+            "secondary": propulsion.FuelTank(self.SECONDARY_TANK_MASS, self.SECONDARY_TANK_VOLUME,
+                                             fuel_mass=secondary_fuel_mass)
         }
         primary_exhaust_velocity = self.fuel_tanks["primary"].exhaust_velocity
         secondary_exhaust_velocity = self.fuel_tanks["secondary"].exhaust_velocity
 
         self.engines = {
-            "main": engine.MainEngine(self.panel, self.primary_burn_rate,
-                                      primary_exhaust_velocity, -45, 0.4),
-            "left": engine.RotationEngine(self.panel, self.rotational_burn_rate,
-                                          secondary_exhaust_velocity, self.ROTATE_THRUSTER_POSITION,
-                                          Vector2(18, 13), Vector2(-15, -25), 0.12, LEFT,
-                                          self.rotational_throttle_ratio),
-            "right": engine.RotationEngine(self.panel, self.rotational_burn_rate,
-                                           secondary_exhaust_velocity,
-                                           self.ROTATE_THRUSTER_POSITION,
-                                           Vector2(18, -13), Vector2(-15, 25), 0.12, RIGHT,
-                                           self.rotational_throttle_ratio)
+            "main": propulsion.MainEngine(self.panel, self.primary_burn_rate,
+                                          primary_exhaust_velocity, -45, 0.4),
+            "left": propulsion.RotationEngine(self.panel, self.rotational_burn_rate,
+                                              secondary_exhaust_velocity,
+                                              self.ROTATE_THRUSTER_POSITION,
+                                              Vector2(18, 13), Vector2(-15, -25), 0.12, LEFT,
+                                              self.rotational_throttle_ratio),
+            "right": propulsion.RotationEngine(self.panel, self.rotational_burn_rate,
+                                               secondary_exhaust_velocity,
+                                               self.ROTATE_THRUSTER_POSITION,
+                                               Vector2(18, -13), Vector2(-15, 25), 0.12, RIGHT,
+                                               self.rotational_throttle_ratio)
         }
 
     def _handle_keyboard_input(self):
