@@ -17,8 +17,9 @@ def clamp(x, clamp_range):
 class Engine(object):
     MAX_POWER = 10
     NUM_STATES = 10
+    THROTTLE_STEPS = 10
 
-    def __init__(self, panel, fuel_rate, exhaust_velocity):
+    def __init__(self, panel, fuel_rate, exhaust_velocity, throttle_ratio):
         self.panel = panel
         self.fuel_rate = fuel_rate
         self.exhaust_velocity = exhaust_velocity
@@ -26,7 +27,14 @@ class Engine(object):
         self.power = 0
         self.state = -1
 
-    def update(self, key_on):
+        self.throttle_ratio = throttle_ratio
+        self.throttle_state = self.THROTTLE_STEPS
+
+    def update(self, key_on, throttle_on=False):
+        self._update_state(key_on)
+        self._update_throttle(throttle_on)
+
+    def _update_state(self, key_on):
         self.engine_on = key_on
         if self.engine_on:
             if self.power < self.MAX_POWER:
@@ -38,7 +46,26 @@ class Engine(object):
             self.state = -1
             if self.power > 0:
                 self.power -= 1
-        return self.power / self.MAX_POWER * self.fuel_rate * settings.tick_size
+
+    def _update_throttle(self, throttle_on):
+        if throttle_on and self.throttle_state > 0:
+            self.throttle_state -= 1
+        elif not throttle_on and self.throttle_state < self.THROTTLE_STEPS:
+            self.throttle_state += 1
+
+    @property
+    def throttle_factor(self):
+        return (self.throttle_ratio
+                + (1 - self.throttle_ratio) * (self.throttle_state / self.THROTTLE_STEPS))
+
+    @property
+    def thrust_factor(self):
+        power_factor = self.power / self.MAX_POWER
+        return power_factor * self.throttle_factor
+
+    @property
+    def fuel_burn(self):
+        return self.thrust_factor * self.fuel_rate * settings.tick_size
 
     @property
     def image_index(self):
@@ -54,14 +81,15 @@ class Engine(object):
 
 
 class MainEngine(Engine):
-    def __init__(self, panel, fuel_rate, exhaust_velocity, offset_y, scale_factor):
-        super().__init__(panel, fuel_rate, exhaust_velocity)
+    def __init__(self, panel, fuel_rate, exhaust_velocity, offset_y, scale_factor,
+                 throttle_ratio=1.0):
+        super().__init__(panel, fuel_rate, exhaust_velocity, throttle_ratio)
         self.full_force = self.fuel_rate * self.exhaust_velocity
         self.flame = Flame(panel, Vector2(offset_y, 0), scale_factor=scale_factor)
 
     @property
     def force(self):
-        return self.full_force * self.power / self.MAX_POWER
+        return self.full_force * self.thrust_factor
 
     def draw(self, center, angular_position):
         self.flame.draw(center, angular_position, self.image_index)
@@ -69,8 +97,8 @@ class MainEngine(Engine):
 
 class RotationEngine(Engine):
     def __init__(self, panel, fuel_rate, exhaust_velocity, outboard_distance,
-                 fore_offset, aft_offset, scale_factor, direction):
-        super().__init__(panel, fuel_rate, exhaust_velocity)
+                 fore_offset, aft_offset, scale_factor, direction, throttle_ratio=1.0):
+        super().__init__(panel, fuel_rate, exhaust_velocity, throttle_ratio)
         self.outboard_distance = outboard_distance
         self.full_torque = self.fuel_rate * self.exhaust_velocity * self.outboard_distance
         self.fore_flame = Flame(panel, fore_offset, direction * 90, scale_factor)
@@ -78,7 +106,7 @@ class RotationEngine(Engine):
 
     @property
     def torque(self):
-        return self.full_torque * self.power / self.MAX_POWER
+        return self.full_torque * self.thrust_factor
 
     def draw(self, center, angular_position):
         self.fore_flame.draw(center, angular_position, self.image_index)
@@ -131,7 +159,7 @@ FUELS = {
 
 class FuelTank(object):
     FULL_PRESSURE = 690  # KPa
-    GAMMA = 1.22  # unitless
+    GAMMA = 1.22         # unitless
 
     def __init__(self, dry_mass, volume, fuel_name="Hydrogen Peroxide", fuel_mass=0):
         self.dry_mass = dry_mass

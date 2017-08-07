@@ -155,16 +155,75 @@ class Pegasus(Ship):
         }
 
     def _handle_keyboard_input(self):
-        burn_mass = 0
-        if not self.fuel_tanks["primary"].is_empty:
-            pressed_keys = pygame.key.get_pressed()
-            burn_mass += self.engines["main"].update(pressed_keys[pygame.K_UP])
-            burn_mass += self.engines["left"].update(pressed_keys[pygame.K_LEFT])
-            burn_mass += self.engines["right"].update(pressed_keys[pygame.K_RIGHT])
-        else:
-            # Always update the engines so the flames will decay when fuel is exhausted.
-            self.engines["main"].update(False)
-            self.engines["left"].update(False)
-            self.engines["right"].update(False)
+        empty = self.fuel_tanks["primary"].is_empty
+        pressed_keys = pygame.key.get_pressed()
+        self.engines["main"].update(not empty and pressed_keys[pygame.K_UP])
+        self.engines["left"].update(not empty and pressed_keys[pygame.K_LEFT])
+        self.engines["right"].update(not empty and pressed_keys[pygame.K_RIGHT])
+        burn_mass = sum([engine_.fuel_burn for engine_ in self.engines.values()])
         self.fuel_tanks["primary"].update(burn_mass)
 
+
+class Manticore(Ship):
+    SCALE_FACTOR = 0.6
+    DRY_MASS = 1400.0               # kg
+    LENGTH = 3.5                    # m
+    ROTATE_THRUSTER_POSITION = 2.0  # m outboard from center of mass
+    PRIMARY_BURN_RATE = 5.5         # kg/sec
+    PRIMARY_TANK_MASS = 50          # kg
+    SECONDARY_TANK_MASS = 10        # kg
+    PRIMARY_TANK_VOLUME = 500       # L
+    SECONDARY_TANK_VOLUME = 50      # L
+
+    PARAMETER_LIMITS = {
+        "primary_fuel_mass": (0, 515),
+        "secondary_fuel_mass": (0, 14),
+        "rotational_burn_rate": (0.2, 2.0),
+        "rotational_throttle_ratio": (0.1, 0.5)
+    }
+
+    def __init__(self, panel, primary_fuel_mass, secondary_fuel_mass,
+                 rotational_burn_rate, rotational_throttle_ratio):
+        super().__init__(panel, "images/A6.png")
+        self.primary_burn_rate = self.PRIMARY_BURN_RATE
+        self.rotational_burn_rate = clamp(rotational_burn_rate,
+                                          self.PARAMETER_LIMITS["rotational_burn_rate"])
+        self.rotational_throttle_ratio = clamp(rotational_throttle_ratio,
+                                               self.PARAMETER_LIMITS["rotational_throttle_ratio"])
+
+        self.fuel_tanks = {
+            "primary": engine.FuelTank(self.PRIMARY_TANK_MASS, self.PRIMARY_TANK_VOLUME,
+                                       "Kerolox", fuel_mass=primary_fuel_mass),
+            "secondary": engine.FuelTank(self.SECONDARY_TANK_MASS, self.SECONDARY_TANK_VOLUME,
+                                         fuel_mass=secondary_fuel_mass)
+        }
+        primary_exhaust_velocity = self.fuel_tanks["primary"].exhaust_velocity
+        secondary_exhaust_velocity = self.fuel_tanks["secondary"].exhaust_velocity
+
+        self.engines = {
+            "main": engine.MainEngine(self.panel, self.primary_burn_rate,
+                                      primary_exhaust_velocity, -45, 0.4),
+            "left": engine.RotationEngine(self.panel, self.rotational_burn_rate,
+                                          secondary_exhaust_velocity, self.ROTATE_THRUSTER_POSITION,
+                                          Vector2(18, 13), Vector2(-15, -25), 0.12, LEFT,
+                                          self.rotational_throttle_ratio),
+            "right": engine.RotationEngine(self.panel, self.rotational_burn_rate,
+                                           secondary_exhaust_velocity,
+                                           self.ROTATE_THRUSTER_POSITION,
+                                           Vector2(18, -13), Vector2(-15, 25), 0.12, RIGHT,
+                                           self.rotational_throttle_ratio)
+        }
+
+    def _handle_keyboard_input(self):
+        pressed_keys = pygame.key.get_pressed()
+        primary_empty = self.fuel_tanks["primary"].is_empty
+        self.engines["main"].update(not primary_empty and pressed_keys[pygame.K_UP])
+        self.fuel_tanks["primary"].update(self.engines["main"].fuel_burn)
+
+        secondary_empty = self.fuel_tanks["secondary"].is_empty
+        self.engines["left"].update(not secondary_empty and pressed_keys[pygame.K_LEFT],
+                                    pressed_keys[pygame.K_LSHIFT])
+        self.engines["right"].update(not secondary_empty and pressed_keys[pygame.K_RIGHT],
+                                     pressed_keys[pygame.K_LSHIFT])
+        self.fuel_tanks["secondary"].update(self.engines["left"].fuel_burn
+                                            + self.engines["right"].fuel_burn)
