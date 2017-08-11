@@ -46,7 +46,10 @@ class Course(object):
 
     @property
     def status(self):
-        return self.gate_set.current_gate_index, self.gate_set.num_gates
+        return {"current_gate": self.gate_set.current_gate_index,
+                "num_gates": self.gate_set.num_gates,
+                "current_proxy": self.proxy_set.proxies_completed,
+                "num_proxies": self.proxy_set.num_proxies}
     
     def draw(self, camera_position):
         self.gate_set.draw(camera_position)

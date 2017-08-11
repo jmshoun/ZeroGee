@@ -49,7 +49,7 @@ class Level(object):
         self.hud_panel = Panel(screen.subsurface(pygame.Rect(*panel_sizes["hud_rect"])))
         self.minimap_panel = Panel(screen.subsurface(pygame.Rect(*panel_sizes["minimap_rect"])))
         
-        self.ship = ship.Manticore(self.main_panel.surface, 100, 10, 0.5, 0.2)
+        self.ship = ship.Manticore(self.main_panel.surface, 400, 50, 0.5, 0.2)
         self.ship.set_position((-0.1, 0), 0)
         self.course = course.Course(self.main_panel.surface, course_path)
 

@@ -12,8 +12,7 @@ class HUD(object):
 
     def __init__(self, panel):
         self.time = 0
-        self.gate_number = 0
-        self.total_gates = 0
+        self.course_status = {}
         self.speed = 0
         self.panel = panel
         self.fuel_mass = None
@@ -21,7 +20,7 @@ class HUD(object):
     
     def update(self, time, course_status, ship_status):
         self.time = time
-        self.gate_number, self.total_gates = course_status
+        self.course_status = course_status
         self.speed, self.fuel_mass = ship_status
         self.fuel_mass = max(self.fuel_mass, 0)
     
@@ -32,9 +31,15 @@ class HUD(object):
         self._draw_fuel()
 
     def _draw_waypoint(self):
-        waypoint_text = "{0:02d} / {1:02d}".format(self.gate_number, self.total_gates)
-        gate_text = "{0:02d}/{1:02d}".format(self.gate_number, self.total_gates)
-        proxy_text = "--/--"
+        current_gate = self.course_status["current_gate"]
+        num_gates = self.course_status["num_gates"]
+        current_proxy = self.course_status["current_proxy"]
+        num_proxies = self.course_status["num_proxies"]
+        waypoint_text = "{0:02d} / {1:02d}".format(current_gate + current_proxy,
+                                                   num_gates + num_proxies)
+        gate_text = "{0:02d}/{1:02d}".format(current_gate, num_gates) if num_gates > 0 else "--/--"
+        proxy_text = "{0:02d}/{1:02d}".format(current_proxy, num_proxies) \
+            if num_proxies > 0 else "--/--"
 
         text.render_text(self.panel, self.primary_font, "Waypoints:",
                          (0.50, self.WAYPOINT_VERTICAL_OFFSET + .04),
