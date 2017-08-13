@@ -2,12 +2,12 @@ import random
 
 import pygame
 
-import ship
 import hud
-import course
 import starfield
 import minimap
 import config
+import course
+import ship
 
 settings = config.DisplaySettings()
 STATUS_READY = 0
@@ -39,7 +39,7 @@ class Panel(object):
 
 
 class Level(object):
-    def __init__(self, screen, course_path):
+    def __init__(self, screen, course_dict, ship_dict):
         self.screen = screen
         self.start_time = pygame.time.get_ticks()
         self.current_time = 0
@@ -49,9 +49,9 @@ class Level(object):
         self.hud_panel = Panel(screen.subsurface(pygame.Rect(*panel_sizes["hud_rect"])))
         self.minimap_panel = Panel(screen.subsurface(pygame.Rect(*panel_sizes["minimap_rect"])))
         
-        self.ship = ship.Manticore(self.main_panel.surface, 400, 50, 0.5, 0.2)
+        self.ship = ship.ship_from_dict(self.main_panel.surface, ship_dict)
         self.ship.set_position((-0.1, 0), 0)
-        self.course = course.Course(self.main_panel.surface, course_path)
+        self.course = course.Course(self.main_panel.surface, course_dict)
 
         self.starfield = starfield.Starfield(self.main_panel.surface)
         self.level_splash = LevelSplash(self.screen, "Ready", (255, 0, 255), 10000)

@@ -8,17 +8,21 @@ import finishbox
 
 
 class Course(object):
-    def __init__(self, panel, course_path):
+    def __init__(self, panel, dict_):
+        gate_spec = dict_.get("gates", []), dict_.get("gate_sequence", [])
+        proxy_spec = dict_.get("proxies", [])
+        gravity_zone_spec = dict_.get("gravity_zones", [])
+
+        self.gate_set = GateSet(panel, *gate_spec)
+        self.proxy_set = ProxySet(panel, proxy_spec)
+        self.gravity_zone_set = GravityZoneSet(panel, gravity_zone_spec)
+        self.finish_box = finishbox.FinishBox(panel, dict_["finish_box"])
+
+    @classmethod
+    def from_file(cls, course_path):
         with open(course_path) as course_file:
             course_dict = yaml.load(course_file.read())
-
-        gate_spec = course_dict.get("gates", []), course_dict.get("gate_sequence", [])
-        self.gate_set = GateSet(panel, *gate_spec)
-        proxy_spec = course_dict.get("proxies", [])
-        self.proxy_set = ProxySet(panel, proxy_spec)
-        gravity_zone_spec = course_dict.get("gravity_zones", [])
-        self.gravity_zone_set = GravityZoneSet(panel, gravity_zone_spec)
-        self.finish_box = finishbox.FinishBox(panel, course_dict["finish_box"])
+        return cls(course_dict)
 
     @property
     def bounding_rect(self):

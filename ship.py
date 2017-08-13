@@ -19,6 +19,16 @@ def clamp(x, clamp_range):
     return clamp_min if x < clamp_min else clamp_max if x > clamp_max else x
 
 
+def ship_from_dict(panel, dict_):
+    ship_type = dict_["ship_class"]
+    if ship_type == "Pegasus":
+        return Pegasus.from_dict(panel, dict_)
+    elif ship_type == "Manticore":
+        return Manticore.from_dict(panel, dict_)
+    else:
+        raise Exception("Ship type {} does not exist.".format(ship_type))
+
+
 class Ship(object):
     CAMERA_OFFSET_STRENGTH = 0.2
     # Placeholder values. All of these should be overriden, and in fact most of these values should
@@ -154,6 +164,10 @@ class Pegasus(Ship):
                                                Vector2(15, -10), Vector2(-15, 35), 0.12, RIGHT)
         }
 
+    @classmethod
+    def from_dict(cls, panel, dict_):
+        return cls(panel, dict_["primary_fuel_mass"], dict_["rotational_burn_rate"])
+
     def _handle_keyboard_input(self):
         empty = self.fuel_tanks["primary"].is_empty
         pressed_keys = pygame.key.get_pressed()
@@ -214,6 +228,11 @@ class Manticore(Ship):
                                                Vector2(18, -13), Vector2(-15, 25), 0.12, RIGHT,
                                                self.rotational_throttle_ratio)
         }
+
+    @classmethod
+    def from_dict(cls, panel, dict_):
+        return cls(panel, dict_["primary_fuel_mass"], dict_["secondary_fuel_mass"],
+                   dict_["rotational_burn_rate", dict_["rotational_throttle_ratio"]])
 
     def _handle_keyboard_input(self):
         pressed_keys = pygame.key.get_pressed()

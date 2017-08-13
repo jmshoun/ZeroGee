@@ -1,0 +1,3 @@
+ship_class: "Pegasus"
+primary_fuel_mass: 200
+rotational_burn_rate: 0.5

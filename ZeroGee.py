@@ -2,6 +2,7 @@
 
 import sys
 
+import yaml
 import pygame
 from pygame.locals import *
 
@@ -15,7 +16,12 @@ screen = pygame.display.set_mode(settings.screen_resolution, pygame.FULLSCREEN)
 pygame.display.set_caption('ZeroGee')
 
 clock = pygame.time.Clock()
-level = level.Level(screen, sys.argv[1])
+
+with open(sys.argv[1]) as course_file:
+    course_dict = yaml.load(course_file.read())
+with open(sys.argv[2]) as ship_file:
+    ship_dict = yaml.load(ship_file.read())
+level = level.Level(screen, course_dict, ship_dict)
 
 
 def check_for_termination():
