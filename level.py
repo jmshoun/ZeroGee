@@ -40,7 +40,7 @@ class Panel(object):
 
 
 class Level(object):
-    def __init__(self, screen, course_dict, ship_dict):
+    def __init__(self, screen, course_dict, ship_dict, comparison_split_dict=None):
         self.screen = screen
         self.start_time = pygame.time.get_ticks()
         self.current_time = 0
@@ -54,7 +54,8 @@ class Level(object):
         self.ship.set_position((-0.1, 0), 0)
         self.course = course.Course(self.main_panel.surface, course_dict)
         self.active_splits = waypoint.Splits(self.course.num_waypoints)
-        self.comparison_splits = self.active_splits
+        self.comparison_splits = waypoint.Splits.from_dict(comparison_split_dict) \
+            if comparison_split_dict else self.active_splits
 
         self.starfield = starfield.Starfield(self.main_panel.surface)
         self.level_splash = LevelSplash(self.screen, "Ready", (255, 0, 255), 10000)

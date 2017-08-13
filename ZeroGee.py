@@ -7,6 +7,7 @@ import pygame
 from pygame.locals import *
 
 import level
+import profile
 import config
 
 settings = config.DisplaySettings()
@@ -17,11 +18,14 @@ pygame.display.set_caption('ZeroGee')
 
 clock = pygame.time.Clock()
 
-with open(sys.argv[1]) as course_file:
+player_profile = profile.Profile.load("default")
+course_name = sys.argv[1]
+with open(course_name + ".yaml") as course_file:
     course_dict = yaml.load(course_file.read())
 with open(sys.argv[2]) as ship_file:
     ship_dict = yaml.load(ship_file.read())
-level = level.Level(screen, course_dict, ship_dict)
+best_split_dict = player_profile.course_bests.get(course_name)
+level = level.Level(screen, course_dict, ship_dict, best_split_dict)
 
 
 def check_for_termination():
@@ -36,3 +40,9 @@ while not check_for_termination():
     
     pygame.display.flip()
     clock.tick(1 / settings.tick_size)
+
+last_split_dict = level.active_splits.as_dict()
+if not best_split_dict or last_split_dict["final_time"] < best_split_dict["final_time"]:
+    player_profile.course_bests[course_name] = last_split_dict
+player_profile.save()
+

@@ -110,7 +110,8 @@ class HUD(object):
 
     @staticmethod
     def format_time(time, signed=False):
+        sign_prefix = "+" if (signed and time > 0) else "-" if signed else ""
+        time = abs(time)
         time_minutes = int(time // 60)
         time_seconds = time % 60
-        sign_prefix = "+" if (signed and time > 0) else "-" if signed else ""
         return "{0}{1:02d}:{2:>05.2f}".format(sign_prefix, time_minutes, time_seconds)

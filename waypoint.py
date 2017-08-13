@@ -91,12 +91,20 @@ class Proxy(object):
 
 
 class Splits(object):
-    def __init__(self, num_waypoints):
+    def __init__(self, num_waypoints, split_times=None, final_time=math.nan):
         self.current_waypoint = 0
-        self.split_times = [math.nan] * num_waypoints
-        self.final_time = math.nan
+        self.split_times = split_times if split_times else [math.nan] * num_waypoints
+        self.final_time = final_time
+
+    @classmethod
+    def from_dict(cls, dict_):
+        return cls(len(dict_["split_times"]), dict_["split_times"], dict_["final_time"])
 
     def update(self, current_time, waypoints_complete):
         while self.current_waypoint < waypoints_complete:
             self.split_times[self.current_waypoint] = current_time
             self.current_waypoint += 1
+
+    def as_dict(self):
+        return {"split_times": self.split_times,
+                "final_time": self.final_time}
