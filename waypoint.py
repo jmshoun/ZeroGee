@@ -1,3 +1,5 @@
+import math
+
 import pygame
 from pygame.math import Vector2
 
@@ -86,3 +88,15 @@ class Proxy(object):
     def draw(self, camera_position):
         self.rect.center = (self.position - camera_position) / settings.meters_per_pixel
         self.panel.blit(self.images[self.status], self.rect)
+
+
+class Splits(object):
+    def __init__(self, num_waypoints):
+        self.current_waypoint = 0
+        self.split_times = [math.nan] * num_waypoints
+        self.final_time = math.nan
+
+    def update(self, current_time, waypoints_complete):
+        while self.current_waypoint < waypoints_complete:
+            self.split_times[self.current_waypoint] = current_time
+            self.current_waypoint += 1

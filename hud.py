@@ -1,3 +1,5 @@
+import math
+
 import pygame
 import pygame.freetype
 
@@ -18,8 +20,8 @@ class HUD(object):
         self.fuel_mass = None
         self.primary_font = pygame.freetype.Font('fonts/AlphaSmart3000.ttf')
     
-    def update(self, time, course_status, ship_status):
-        self.time = time
+    def update(self, timing_status, course_status, ship_status):
+        self.timing_status = timing_status
         self.course_status = course_status
         self.speed, self.fuel_mass = ship_status
         self.fuel_mass = max(self.fuel_mass, 0)
@@ -85,20 +87,30 @@ class HUD(object):
                          foreground=text.BLUE)
 
     def _draw_time(self):
-        time_text = self.format_time(self.time)
+        time_text = self.format_time(self.timing_status["current_time"])
+        if math.isnan(self.timing_status["last_split"]):
+            split_text = "--:--.--"
+            delta_text = "+--:--.--"
+            delta_color = text.WHITE
+        else:
+            split_text = self.format_time(self.timing_status["last_split"])
+            delta_text = self.format_time(self.timing_status["split_delta"], signed=True)
+            delta_color = text.RED if self.timing_status["split_delta"] > 0 else text.GREEN
 
         text.render_text(self.panel, self.primary_font, time_text,
                          (0.50, self.TIME_VERTICAL_OFFSET + .06),  size=3.0, justify=text.CENTER)
         text.render_text(self.panel, self.primary_font, "Split:",
                          (0.45, self.TIME_VERTICAL_OFFSET + 0.17), foreground=text.BLUE, size=1.0,
                          justify=text.CENTER)
-        text.render_text(self.panel, self.primary_font, "00:00.00",
+        text.render_text(self.panel, self.primary_font, split_text,
                          (0.95, self.TIME_VERTICAL_OFFSET + 0.17), size=1.0, justify=text.RIGHT)
-        text.render_text(self.panel, self.primary_font, "+00:00.00",
-                         (0.95, self.TIME_VERTICAL_OFFSET + 0.23), size=1.0, justify=text.RIGHT)
+        text.render_text(self.panel, self.primary_font, delta_text,
+                         (0.95, self.TIME_VERTICAL_OFFSET + 0.23), foreground=delta_color,
+                         size=1.0, justify=text.RIGHT)
 
     @staticmethod
-    def format_time(time):
+    def format_time(time, signed=False):
         time_minutes = int(time // 60)
         time_seconds = time % 60
-        return "{0:02d}:{1:>05.2f}".format(time_minutes, time_seconds)
+        sign_prefix = "+" if (signed and time > 0) else "-" if signed else ""
+        return "{0}{1:02d}:{2:>05.2f}".format(sign_prefix, time_minutes, time_seconds)

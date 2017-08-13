@@ -8,6 +8,7 @@ import minimap
 import config
 import course
 import ship
+import waypoint
 
 settings = config.DisplaySettings()
 STATUS_READY = 0
@@ -52,6 +53,8 @@ class Level(object):
         self.ship = ship.ship_from_dict(self.main_panel.surface, ship_dict)
         self.ship.set_position((-0.1, 0), 0)
         self.course = course.Course(self.main_panel.surface, course_dict)
+        self.active_splits = waypoint.Splits(self.course.num_waypoints)
+        self.comparison_splits = self.active_splits
 
         self.starfield = starfield.Starfield(self.main_panel.surface)
         self.level_splash = LevelSplash(self.screen, "Ready", (255, 0, 255), 10000)
@@ -68,7 +71,7 @@ class Level(object):
             self._update_set()
         elif self.status is STATUS_GO:
             self._update_go()
-        self.hud.update(self.current_time, self.course.status, self.ship.status)
+        self.hud.update(self.timing_status, self.course.status, self.ship.status)
     
     def _update_ready(self):
         pressed_keys = pygame.key.get_pressed()
@@ -96,11 +99,23 @@ class Level(object):
         external_acceleration = self.course.acceleration(self.ship.position)
         self.ship.update(external_acceleration)
         self.camera_position = self.ship.camera_position
-        
         self.course.update(self.ship.position)
+        self.active_splits.update(self.current_time, self.course.waypoints_completed)
+
         if self.course.finish_box.finished:
             self.status = STATUS_FINISHED
             self.level_splash = LevelSplash(self.screen, "Finished", (255,  0, 255), 5)
+            self.active_splits.final_time = self.current_time
+
+    @property
+    def timing_status(self):
+        current_waypoint = self.course.waypoints_completed - 1
+        last_split = self.active_splits.split_times[current_waypoint]
+        comparison_split = self.comparison_splits.split_times[current_waypoint]
+        split_delta = last_split - comparison_split
+        return {"current_time": self.current_time,
+                "last_split": last_split,
+                "split_delta": split_delta}
     
     def draw(self):
         self.screen.fill((0, 0, 0))

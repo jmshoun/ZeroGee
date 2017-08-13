@@ -76,6 +76,14 @@ class Course(object):
     def acceleration(self, ship_position):
         return self.gravity_zone_set.acceleration(ship_position)
 
+    @property
+    def num_waypoints(self):
+        return self.proxy_set.num_proxies + self.gate_set.num_gates
+
+    @property
+    def waypoints_completed(self):
+        return self.proxy_set.proxies_completed + self.gate_set.current_gate_index
+
 
 class ProxySet(object):
     def __init__(self, panel, proxies):
