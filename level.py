@@ -92,6 +92,7 @@ class Level(object):
             self.status = STATUS_FALSE_START
             self.level_splash = LevelSplash(self.screen, "False Start!",
                                             (255, 0, 255), 5)
+            self.active_splits.status = "Disqualified"
     
     def _update_go(self):
         if self.course.finish_box.timer == 0:
@@ -106,7 +107,7 @@ class Level(object):
         if self.course.finish_box.finished:
             self.status = STATUS_FINISHED
             self.level_splash = LevelSplash(self.screen, "Finished", (255,  0, 255), 5)
-            self.active_splits.final_time = self.current_time
+            self.active_splits.set_final_time(self.current_time)
 
     @property
     def timing_status(self):
