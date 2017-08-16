@@ -24,7 +24,7 @@ with open(course_name + ".yaml") as course_file:
     course_dict = yaml.load(course_file.read())
 with open(sys.argv[2]) as ship_file:
     ship_dict = yaml.load(ship_file.read())
-best_splits = player_profile.fastest_run_splits(course_dict)
+best_splits = player_profile.fastest_run_splits(course_dict, ship_dict)
 level = level.Level(screen, course_dict, ship_dict, best_splits)
 
 

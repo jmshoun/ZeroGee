@@ -40,11 +40,18 @@ class Profile(object):
             self.run_records[course_hash] = []
         self.run_records[course_hash] += [RunRecord(ship_dict, splits)]
 
-    def fastest_run_splits(self, course_dict):
+    def fastest_run_splits(self, course_dict, ship_dict):
         course_hash = self.dict_hash(course_dict)
         if course_hash not in self.run_records.keys():
             return None
-        sorted_records = sorted(self.run_records[course_hash], key=lambda record: record.run_time)
+
+        finish_records = [record for record in self.run_records[course_hash]
+                          if record.splits.status == "Finished"
+                          and ship_dict["ship_class"] == record.ship_dict["ship_class"]]
+        if len(finish_records) == 0:
+            return None
+
+        sorted_records = sorted(finish_records, key=lambda record: record.run_time)
         return sorted_records[0].splits
 
     @staticmethod

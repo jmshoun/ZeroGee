@@ -232,7 +232,7 @@ class Manticore(Ship):
     @classmethod
     def from_dict(cls, panel, dict_):
         return cls(panel, dict_["primary_fuel_mass"], dict_["secondary_fuel_mass"],
-                   dict_["rotational_burn_rate", dict_["rotational_throttle_ratio"]])
+                   dict_["rotational_burn_rate"], dict_["rotational_throttle_ratio"])
 
     def _handle_keyboard_input(self):
         pressed_keys = pygame.key.get_pressed()
