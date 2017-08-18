@@ -161,11 +161,11 @@ class FuelTank(object):
     FULL_PRESSURE = 690  # KPa
     GAMMA = 1.22         # unitless
 
-    def __init__(self, dry_mass, volume, fuel_name="Hydrogen Peroxide", fuel_mass=0):
+    def __init__(self, dry_mass, volume, fuel_name="Hydrogen Peroxide", fuel_volume=0):
         self.dry_mass = dry_mass
         self.volume = volume
         self.fuel = FUELS[fuel_name]
-        self.fuel_mass = clamp(fuel_mass, (0, self.max_fuel_mass))
+        self.fuel_mass = self.fuel.density * clamp(fuel_volume, (0, self.volume))
         self.max_efficiency_coefficient = self.efficiency_coefficient(self.max_fuel_mass)
 
     @property
@@ -173,12 +173,12 @@ class FuelTank(object):
         return self.fuel_mass <= 0
 
     @property
-    def mass(self):
-        return self.dry_mass + self.fuel_mass
+    def max_fuel_mass(self):
+        return self.fuel.density * self.volume
 
     @property
-    def max_fuel_mass(self):
-        return self.volume * self.fuel.density
+    def mass(self):
+        return self.dry_mass + self.fuel_mass
 
     @property
     def exhaust_velocity(self):

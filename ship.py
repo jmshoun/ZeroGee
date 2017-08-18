@@ -137,11 +137,11 @@ class Pegasus(Ship):
     PRIMARY_TANK_VOLUME = 200           # L
 
     PARAMETER_LIMITS = {
-        "primary_fuel_mass": (0, 280),
+        "primary_fuel_volume": (0, 200),
         "rotational_burn_rate": (0.15, 1.0)
     }
 
-    def __init__(self, panel, primary_fuel_mass, rotational_burn_rate):
+    def __init__(self, panel, primary_fuel_volume, rotational_burn_rate):
         super().__init__(panel, "images/A5.png")
         self.primary_burn_rate = self.PRIMARY_BURN_RATE
         self.rotational_burn_rate = clamp(rotational_burn_rate,
@@ -149,7 +149,7 @@ class Pegasus(Ship):
 
         self.fuel_tanks = {
             "primary": propulsion.FuelTank(self.PRIMARY_TANK_MASS, self.PRIMARY_TANK_VOLUME,
-                                           fuel_mass=primary_fuel_mass)
+                                           fuel_volume=primary_fuel_volume)
         }
         exhaust_velocity = self.fuel_tanks["primary"].exhaust_velocity
 
@@ -196,7 +196,7 @@ class Manticore(Ship):
         "rotational_throttle_ratio": (0.1, 0.5)
     }
 
-    def __init__(self, panel, primary_fuel_mass, secondary_fuel_mass,
+    def __init__(self, panel, primary_fuel_volume, secondary_fuel_volume,
                  rotational_burn_rate, rotational_throttle_ratio):
         super().__init__(panel, "images/A6.png")
         self.primary_burn_rate = self.PRIMARY_BURN_RATE
@@ -207,9 +207,9 @@ class Manticore(Ship):
 
         self.fuel_tanks = {
             "primary": propulsion.FuelTank(self.PRIMARY_TANK_MASS, self.PRIMARY_TANK_VOLUME,
-                                           "Kerolox", fuel_mass=primary_fuel_mass),
+                                           "Kerolox", fuel_volume=primary_fuel_volume),
             "secondary": propulsion.FuelTank(self.SECONDARY_TANK_MASS, self.SECONDARY_TANK_VOLUME,
-                                             fuel_mass=secondary_fuel_mass)
+                                             fuel_volume=secondary_fuel_volume)
         }
         primary_exhaust_velocity = self.fuel_tanks["primary"].exhaust_velocity
         secondary_exhaust_velocity = self.fuel_tanks["secondary"].exhaust_velocity
