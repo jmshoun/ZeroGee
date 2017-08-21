@@ -1,5 +1,5 @@
 ship_class: "Manticore"
 primary_fuel_mass: 200
 secondary_fuel_mass: 14
-rotational_burn_rate: 1.0
+rotational_burn_rate: 0.5
 rotational_throttle_ratio: 0.2

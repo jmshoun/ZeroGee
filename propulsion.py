@@ -19,14 +19,20 @@ class Engine(object):
     NUM_STATES = 10
     THROTTLE_STEPS = 10
 
-    def __init__(self, panel, fuel_rate, exhaust_velocity, throttle_ratio):
+    def __init__(self, panel, fuel_rate, fuel_tank,
+                 offset_pixels, scale_factor, direction=0, outboard_meters=0, throttle_ratio=1.0):
         self.panel = panel
         self.fuel_rate = fuel_rate
-        self.exhaust_velocity = exhaust_velocity
+        self.fuel_tank = fuel_tank
+        self.direction = direction
+        self.full_force = self.fuel_rate * self.fuel_tank.exhaust_velocity
+        self.full_torque = self.full_force * outboard_meters * math.copysign(1, self.direction)
+
+        self.flame = Flame(panel, offset_pixels, self.direction, scale_factor=scale_factor)
+
         self.engine_on = False
         self.power = 0
         self.state = -1
-
         self.throttle_ratio = throttle_ratio
         self.throttle_state = self.THROTTLE_STEPS
 
@@ -64,6 +70,16 @@ class Engine(object):
         return power_factor * self.throttle_factor
 
     @property
+    def force(self):
+        force_magnitude = self.full_force * self.thrust_factor * self.fuel_tank.efficiency
+        force_vector = Vector2(force_magnitude, 0)
+        return force_vector.rotate(self.direction)
+
+    @property
+    def torque(self):
+        return self.full_torque * self.thrust_factor * self.fuel_tank.efficiency
+
+    @property
     def fuel_burn(self):
         return self.thrust_factor * self.fuel_rate * settings.tick_size
 
@@ -79,38 +95,8 @@ class Engine(object):
         else:
             return None
 
-
-class MainEngine(Engine):
-    def __init__(self, panel, fuel_rate, exhaust_velocity, offset_y, scale_factor,
-                 throttle_ratio=1.0):
-        super().__init__(panel, fuel_rate, exhaust_velocity, throttle_ratio)
-        self.full_force = self.fuel_rate * self.exhaust_velocity
-        self.flame = Flame(panel, Vector2(offset_y, 0), scale_factor=scale_factor)
-
-    @property
-    def force(self):
-        return self.full_force * self.thrust_factor
-
     def draw(self, center, angular_position):
         self.flame.draw(center, angular_position, self.image_index)
-
-
-class RotationEngine(Engine):
-    def __init__(self, panel, fuel_rate, exhaust_velocity, outboard_distance,
-                 fore_offset, aft_offset, scale_factor, direction, throttle_ratio=1.0):
-        super().__init__(panel, fuel_rate, exhaust_velocity, throttle_ratio)
-        self.outboard_distance = outboard_distance
-        self.full_torque = self.fuel_rate * self.exhaust_velocity * self.outboard_distance
-        self.fore_flame = Flame(panel, fore_offset, direction * 90, scale_factor)
-        self.aft_flame = Flame(panel, aft_offset, -direction * 90, scale_factor)
-
-    @property
-    def torque(self):
-        return self.full_torque * self.thrust_factor
-
-    def draw(self, center, angular_position):
-        self.fore_flame.draw(center, angular_position, self.image_index)
-        self.aft_flame.draw(center, angular_position, self.image_index)
 
 
 class Flame(object):

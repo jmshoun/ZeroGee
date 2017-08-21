@@ -87,12 +87,14 @@ class Ship(object):
 
     @property
     def force(self):
-        return self.engines["main"].force * self.fuel_tanks["primary"].efficiency
+        total_force = Vector2(0, 0)
+        for engine_ in self.engines.values():
+            total_force += engine_.force
+        return total_force
 
     @property
     def torque(self):
-        return ((self.engines["left"].torque - self.engines["right"].torque)
-                * self.fuel_tanks["primary"].efficiency)
+        return sum([engine_.torque for engine_ in self.engines.values()])
 
     def update(self, external_acceleration):
         self._handle_keyboard_input()
@@ -102,9 +104,8 @@ class Ship(object):
         self.velocity_angular += acceleration_angular
         self.position_angular += self.velocity_angular * settings.tick_size
 
-        acceleration_magnitude = self.force / self.mass * settings.tick_size
-        internal_acceleration = Vector2()
-        internal_acceleration.from_polar((acceleration_magnitude, -self.position_angular))
+        internal_acceleration = self.force / self.mass * settings.tick_size
+        internal_acceleration.rotate_ip(-self.position_angular)
         acceleration = external_acceleration + internal_acceleration
         self.velocity += acceleration
         self.position += self.velocity * settings.tick_size
@@ -151,17 +152,23 @@ class Pegasus(Ship):
             "primary": propulsion.FuelTank(self.PRIMARY_TANK_MASS, self.PRIMARY_TANK_VOLUME,
                                            fuel_volume=primary_fuel_volume)
         }
-        exhaust_velocity = self.fuel_tanks["primary"].exhaust_velocity
 
         self.engines = {
-            "main": propulsion.MainEngine(self.panel, self.primary_burn_rate,
-                                          exhaust_velocity, -35, 0.4),
-            "left": propulsion.RotationEngine(self.panel, self.rotational_burn_rate,
-                                              exhaust_velocity, self.ROTATE_THRUSTER_POSITION,
-                                              Vector2(15, 10), Vector2(-15, -35), 0.12, LEFT),
-            "right": propulsion.RotationEngine(self.panel, self.rotational_burn_rate,
-                                               exhaust_velocity, self.ROTATE_THRUSTER_POSITION,
-                                               Vector2(15, -10), Vector2(-15, 35), 0.12, RIGHT)
+            "main": propulsion.Engine(self.panel, self.primary_burn_rate,
+                                      self.fuel_tanks["primary"], Vector2(-35, 0), 0.4,
+                                      direction=0),
+            "left_fore": propulsion.Engine(self.panel, self.rotational_burn_rate,
+                                           self.fuel_tanks["primary"], Vector2(15, 10), 0.12,
+                                           90, self.ROTATE_THRUSTER_POSITION),
+            "left_aft": propulsion.Engine(self.panel, self.rotational_burn_rate,
+                                          self.fuel_tanks["primary"], Vector2(-15, 35), 0.12,
+                                          90, -self.ROTATE_THRUSTER_POSITION),
+            "right_fore": propulsion.Engine(self.panel, self.rotational_burn_rate,
+                                            self.fuel_tanks["primary"], Vector2(15, -10), 0.12,
+                                            -90, self.ROTATE_THRUSTER_POSITION),
+            "right_aft": propulsion.Engine(self.panel, self.rotational_burn_rate,
+                                           self.fuel_tanks["primary"], Vector2(-15, -35), 0.12,
+                                           -90, -self.ROTATE_THRUSTER_POSITION)
         }
 
     @classmethod
@@ -172,8 +179,10 @@ class Pegasus(Ship):
         empty = self.fuel_tanks["primary"].is_empty
         pressed_keys = pygame.key.get_pressed()
         self.engines["main"].update(not empty and pressed_keys[pygame.K_UP])
-        self.engines["left"].update(not empty and pressed_keys[pygame.K_LEFT])
-        self.engines["right"].update(not empty and pressed_keys[pygame.K_RIGHT])
+        self.engines["left_fore"].update(not empty and pressed_keys[pygame.K_LEFT])
+        self.engines["right_aft"].update(not empty and pressed_keys[pygame.K_LEFT])
+        self.engines["right_fore"].update(not empty and pressed_keys[pygame.K_RIGHT])
+        self.engines["left_aft"].update(not empty and pressed_keys[pygame.K_RIGHT])
         burn_mass = sum([engine_.fuel_burn for engine_ in self.engines.values()])
         self.fuel_tanks["primary"].update(burn_mass)
 
@@ -211,22 +220,23 @@ class Manticore(Ship):
             "secondary": propulsion.FuelTank(self.SECONDARY_TANK_MASS, self.SECONDARY_TANK_VOLUME,
                                              fuel_volume=secondary_fuel_volume)
         }
-        primary_exhaust_velocity = self.fuel_tanks["primary"].exhaust_velocity
-        secondary_exhaust_velocity = self.fuel_tanks["secondary"].exhaust_velocity
 
         self.engines = {
-            "main": propulsion.MainEngine(self.panel, self.primary_burn_rate,
-                                          primary_exhaust_velocity, -45, 0.4),
-            "left": propulsion.RotationEngine(self.panel, self.rotational_burn_rate,
-                                              secondary_exhaust_velocity,
-                                              self.ROTATE_THRUSTER_POSITION,
-                                              Vector2(18, 13), Vector2(-15, -25), 0.12, LEFT,
-                                              self.rotational_throttle_ratio),
-            "right": propulsion.RotationEngine(self.panel, self.rotational_burn_rate,
-                                               secondary_exhaust_velocity,
-                                               self.ROTATE_THRUSTER_POSITION,
-                                               Vector2(18, -13), Vector2(-15, 25), 0.12, RIGHT,
-                                               self.rotational_throttle_ratio)
+            "main": propulsion.Engine(self.panel, self.primary_burn_rate,
+                                      self.fuel_tanks["primary"], Vector2(-45, 0), 0.4,
+                                      direction=0),
+            "left_fore": propulsion.Engine(self.panel, self.rotational_burn_rate,
+                                           self.fuel_tanks["secondary"], Vector2(18, 13), 0.12,
+                                           90, self.ROTATE_THRUSTER_POSITION),
+            "left_aft": propulsion.Engine(self.panel, self.rotational_burn_rate,
+                                          self.fuel_tanks["primary"], Vector2(-15, 25), 0.12,
+                                          90, -self.ROTATE_THRUSTER_POSITION),
+            "right_fore": propulsion.Engine(self.panel, self.rotational_burn_rate,
+                                            self.fuel_tanks["primary"], Vector2(18, -13), 0.12,
+                                            -90, self.ROTATE_THRUSTER_POSITION),
+            "right_aft": propulsion.Engine(self.panel, self.rotational_burn_rate,
+                                           self.fuel_tanks["primary"], Vector2(-15, -25), 0.12,
+                                           -90, -self.ROTATE_THRUSTER_POSITION)
         }
 
     @classmethod
@@ -241,9 +251,15 @@ class Manticore(Ship):
         self.fuel_tanks["primary"].update(self.engines["main"].fuel_burn)
 
         secondary_empty = self.fuel_tanks["secondary"].is_empty
-        self.engines["left"].update(not secondary_empty and pressed_keys[pygame.K_LEFT],
-                                    pressed_keys[pygame.K_LSHIFT])
-        self.engines["right"].update(not secondary_empty and pressed_keys[pygame.K_RIGHT],
-                                     pressed_keys[pygame.K_LSHIFT])
-        self.fuel_tanks["secondary"].update(self.engines["left"].fuel_burn
-                                            + self.engines["right"].fuel_burn)
+        self.engines["left_fore"].update(not secondary_empty and pressed_keys[pygame.K_LEFT],
+                                         pressed_keys[pygame.K_LSHIFT])
+        self.engines["right_aft"].update(not secondary_empty and pressed_keys[pygame.K_LEFT],
+                                         pressed_keys[pygame.K_LSHIFT])
+        self.engines["right_fore"].update(not secondary_empty and pressed_keys[pygame.K_RIGHT],
+                                          pressed_keys[pygame.K_LSHIFT])
+        self.engines["left_aft"].update(not secondary_empty and pressed_keys[pygame.K_RIGHT],
+                                        pressed_keys[pygame.K_LSHIFT])
+
+        secondary_burn_mass = sum([engine_.fuel_burn for name, engine_ in self.engines.items()
+                                   if name != "main"])
+        self.fuel_tanks["secondary"].update(secondary_burn_mass)
