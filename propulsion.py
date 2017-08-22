@@ -73,7 +73,7 @@ class Engine(object):
     def force(self):
         force_magnitude = self.full_force * self.thrust_factor * self.fuel_tank.efficiency
         force_vector = Vector2(force_magnitude, 0)
-        return force_vector.rotate(self.direction)
+        return force_vector.rotate(-self.direction)
 
     @property
     def torque(self):

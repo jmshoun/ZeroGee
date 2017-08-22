@@ -1,0 +1,6 @@
+ship_class: "Dragon"
+primary_fuel_volume: 200
+primary_fuel_type: "Kerolox"
+secondary_fuel_volume: 50
+rotational_burn_rate: 2.0
+rotational_throttle_ratio: 0.2
