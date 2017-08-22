@@ -7,3 +7,10 @@ starfield:
   num_stars: [700, 500, 200]
   parallax_rate: [1.2, 0.8, 0.4]
   luminosity: [200, 150, 100]
+controls:
+  forward: "K_UP"
+  left: "K_LEFT"
+  right: "K_RIGHT"
+  left_slew: "K_a"
+  right_slew: "K_d"
+  rotational_throttle: "K_LSHIFT"
