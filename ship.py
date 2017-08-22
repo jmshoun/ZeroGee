@@ -173,7 +173,7 @@ class Pegasus(Ship):
 
     @classmethod
     def from_dict(cls, panel, dict_):
-        return cls(panel, dict_["primary_fuel_mass"], dict_["rotational_burn_rate"])
+        return cls(panel, dict_["primary_fuel_volume"], dict_["rotational_burn_rate"])
 
     def _handle_keyboard_input(self):
         empty = self.fuel_tanks["primary"].is_empty
@@ -199,8 +199,6 @@ class Manticore(Ship):
     SECONDARY_TANK_VOLUME = 50      # L
 
     PARAMETER_LIMITS = {
-        "primary_fuel_mass": (0, 515),
-        "secondary_fuel_mass": (0, 14),
         "rotational_burn_rate": (0.2, 2.0),
         "rotational_throttle_ratio": (0.1, 0.5)
     }
@@ -241,7 +239,7 @@ class Manticore(Ship):
 
     @classmethod
     def from_dict(cls, panel, dict_):
-        return cls(panel, dict_["primary_fuel_mass"], dict_["secondary_fuel_mass"],
+        return cls(panel, dict_["primary_fuel_volume"], dict_["secondary_fuel_volume"],
                    dict_["rotational_burn_rate"], dict_["rotational_throttle_ratio"])
 
     def _handle_keyboard_input(self):
