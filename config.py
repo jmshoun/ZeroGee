@@ -26,3 +26,4 @@ class Controls(object):
         self.left_slew = getattr(pygame, config["left_slew"])
         self.right_slew = getattr(pygame, config["right_slew"])
         self.rotational_throttle = getattr(pygame, config["rotational_throttle"])
+        self.nose = getattr(pygame, config["nose"])

@@ -14,3 +14,4 @@ controls:
   left_slew: "K_a"
   right_slew: "K_d"
   rotational_throttle: "K_LSHIFT"
+  nose: "K_DOWN"

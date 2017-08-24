@@ -1,0 +1,7 @@
+ship_class: "Phoenix"
+primary_fuel_volume: 200
+primary_fuel_type: "Kerolox"
+secondary_fuel_volume: 50
+rotational_burn_rate: 0.8
+rotational_throttle_ratio: 0.2
+nose_burn_rate: 8.0
