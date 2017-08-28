@@ -87,7 +87,7 @@ class Course(object):
 
 class ProxySet(object):
     def __init__(self, panel, proxies):
-        self.proxies = [waypoint.Proxy.from_dict(panel, proxy) for proxy in proxies]
+        self.proxies = [waypoint.ProxySprite.from_dict(panel, proxy) for proxy in proxies]
         self.num_proxies = len(self.proxies)
         self.proxies_completed = 0
 
@@ -107,7 +107,7 @@ class ProxySet(object):
 
 class GateSet(object):
     def __init__(self, panel, gates, gate_sequence):
-        self.gates = [waypoint.Gate.from_dict(panel, gate) for gate in gates]
+        self.gates = [waypoint.GateSprite.from_dict(panel, gate) for gate in gates]
         self.gate_sequence = gate_sequence
         self.num_gates = len(self.gate_sequence)
         self.current_gate_index = 0
