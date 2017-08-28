@@ -5,7 +5,8 @@ import config
 settings = config.DisplaySettings()
 
 FONT_SIZE_LOOKUP = {
-    (1360, 768): 24
+    (1360, 768): 24,
+    (1920, 1080): 32
 }
 
 reference_font_size = FONT_SIZE_LOOKUP[settings.screen_resolution]
