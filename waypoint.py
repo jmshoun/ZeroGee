@@ -42,10 +42,10 @@ class Gate(object):
 
 class GateSprite(Gate, gfx.LevelSprite):
     def __init__(self, panel, *args, **kwargs):
-        super().__init__(panel=panel, *args, **kwargs)
+        super().__init__(*args, **kwargs, panel=panel)
         self.images = [self._load_image('gate-last'), self._load_image('gate-next'),
                        self._load_image('gate-other')]
-        self.rect = self.images[0].get_rect()
+        self.blit_rect = self.images[0].get_rect()
 
     @classmethod
     def from_dict(cls, panel, dict_):
@@ -90,9 +90,9 @@ class Proxy(object):
 
 class ProxySprite(Proxy, gfx.LevelSprite):
     def __init__(self, panel, *args, **kwargs):
-        super().__init__(panel=panel, *args, **kwargs)
+        super().__init__(*args, **kwargs, panel=panel)
         self.images = [self._load_image('proxy-inactive'), self._load_image('proxy-active')]
-        self.rect = self.images[0].get_rect()
+        self.blit_rect = self.images[0].get_rect()
 
     def _load_image(self, image_name):
         image = pygame.image.load('images/' + image_name + '.png')
