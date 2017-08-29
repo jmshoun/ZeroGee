@@ -151,7 +151,7 @@ class GateSet(object):
 
 class GravityZoneSet(object):
     def __init__(self, panel, gravity_zones):
-        self.zones = [hazard.GravityZone.from_dict(panel, zone) for zone in gravity_zones]
+        self.zones = [hazard.GravityZoneSprite.from_dict(panel, zone) for zone in gravity_zones]
 
     def draw(self, camera_position):
         for zone in self.zones:
