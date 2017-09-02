@@ -116,15 +116,13 @@ class EngineSprite(Engine, gfx.LevelSprite):
             return None
 
     def draw(self, center, angular_position):
-        index = self.image_index
-        if index is None:
+        if not self.image:
             return
-
 
         offset_rotated = self.offset.rotate(-angular_position)
         position = center + offset_rotated
         angle = angular_position + self.offset_angle
-        rotated_image = pygame.transform.rotozoom(self.images[index], angle,
+        rotated_image = pygame.transform.rotozoom(self.image, angle,
                                                   settings.scale_factor)
         rotated_image.set_colorkey((0, 0, 0))
         rotated_rect = rotated_image.get_rect()
