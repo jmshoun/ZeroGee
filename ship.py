@@ -5,6 +5,7 @@ from pygame.math import Vector2
 
 import config
 import propulsion
+import gfx
 
 settings = config.DisplaySettings()
 controls = config.Controls()
@@ -23,19 +24,18 @@ def clamp(x, clamp_range):
 def ship_from_dict(panel, dict_):
     ship_type = dict_["ship_class"]
     if ship_type == "Pegasus":
-        return Pegasus.from_dict(panel, dict_)
+        return PegasusSprite.from_dict(panel, dict_)
     elif ship_type == "Manticore":
-        return Manticore.from_dict(panel, dict_)
+        return ManticoreSprite.from_dict(panel, dict_)
     elif ship_type == "Dragon":
-        return Dragon.from_dict(panel, dict_)
+        return DragonSprite.from_dict(panel, dict_)
     elif ship_type == "Phoenix":
-        return Phoenix.from_dict(panel, dict_)
+        return PhoenixSprite.from_dict(panel, dict_)
     else:
         raise Exception("Ship type {} does not exist.".format(ship_type))
 
 
 class Ship(object):
-    CAMERA_OFFSET_STRENGTH = 0.2
     # Placeholder values. All of these should be overriden, and in fact most of these values should
     # trigger runtime errors.
     SCALE_FACTOR = 0
@@ -43,11 +43,8 @@ class Ship(object):
     LENGTH = 0
     ROTATE_THRUSTER_POSITION = 0
 
-    def __init__(self, panel, image_filename):
-        # Graphical elements
-        self.panel = panel
-        self.panel_center = Vector2(panel.get_rect().center) * settings.meters_per_pixel
-        self.image = self.load_image(image_filename)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         # Physical properties
         self.rotational_inertia_factor = self.LENGTH ** 2 / (self.ROTATE_THRUSTER_POSITION * 12)
         # Position and velocity
@@ -63,27 +60,10 @@ class Ship(object):
         self.position = Vector2(position)
         self.position_angular = position_angular
 
-    def load_image(self, image_filename):
-        image = pygame.image.load(image_filename).convert()
-        image = pygame.transform.rotozoom(image, -90, self.SCALE_FACTOR)
-        return image
-
-    @property
-    def rect(self):
-        return self.image.get_rect()
-
     @property
     def status(self):
         speed = self.velocity.length()
         return speed, self.fuel_tanks["primary"].fuel_mass
-
-    @property
-    def camera_position(self):
-        """Camera position is the coordinate (measured in meters) of the top-left corner of the
-        main panel of the display."""
-        offset = Vector2(math.copysign(abs(self.velocity.x ** 0.6), self.velocity.x),
-                         math.copysign(abs(self.velocity.y ** 0.6), self.velocity.y))
-        return self.position - self.panel_center + offset * self.CAMERA_OFFSET_STRENGTH
 
     @property
     def mass(self):
@@ -110,11 +90,10 @@ class Ship(object):
         rotational_fuel_tank = self.fuel_tanks["secondary"]  \
             if "secondary" in self.fuel_tanks.keys() else self.fuel_tanks["primary"]
         thruster_position = self.ROTATE_THRUSTER_POSITION * (1 if location.x > 0 else -1)
-        return propulsion.EngineSprite(self.panel, fuel_rate=self.rotational_burn_rate,
-                                       fuel_tank=rotational_fuel_tank, direction=orientation,
-                                       outboard_meters=thruster_position,
-                                       throttle_ratio=self.rotational_throttle_ratio,
-                                       offset_pixels=location, scale_factor=0.12)
+        return propulsion.Engine(self.panel, fuel_rate=self.rotational_burn_rate,
+                                 fuel_tank=rotational_fuel_tank, direction=orientation,
+                                 outboard_meters=thruster_position,
+                                 throttle_ratio=self.rotational_throttle_ratio)
 
     def update(self, external_acceleration):
         self._handle_keyboard_input()
@@ -133,6 +112,46 @@ class Ship(object):
     def _handle_keyboard_input(self):
         Exception("_handle_Keyboard_input() method not implemented!")
 
+
+class ShipSprite(Ship, gfx.LevelSprite):
+    CAMERA_OFFSET_STRENGTH = 0.2
+
+    def __init__(self, panel, image_filename, *args, **kwargs):
+        super().__init__(*args, **kwargs, panel=panel)
+        self.panel_center = Vector2(self.panel.get_rect().center) * settings.meters_per_pixel
+        self.image_ = self.load_image(image_filename)
+
+    @property
+    def image(self):
+        return self.image_
+
+    def load_image(self, image_filename):
+        image = pygame.image.load(image_filename).convert()
+        image = pygame.transform.rotozoom(image, -90, self.SCALE_FACTOR)
+        return image
+
+    @property
+    def rect(self):
+        return self.image.get_rect()
+
+    @property
+    def camera_position(self):
+        """Camera position is the coordinate (measured in meters) of the top-left corner of the
+        main panel of the display."""
+        offset = Vector2(math.copysign(abs(self.velocity.x ** 0.6), self.velocity.x),
+                         math.copysign(abs(self.velocity.y ** 0.6), self.velocity.y))
+        return self.position - self.panel_center + offset * self.CAMERA_OFFSET_STRENGTH
+
+    def rotational_engine(self, location, orientation):
+        rotational_fuel_tank = self.fuel_tanks["secondary"]  \
+            if "secondary" in self.fuel_tanks.keys() else self.fuel_tanks["primary"]
+        thruster_position = self.ROTATE_THRUSTER_POSITION * (1 if location.x > 0 else -1)
+        return propulsion.EngineSprite(self.panel, fuel_rate=self.rotational_burn_rate,
+                                       fuel_tank=rotational_fuel_tank, direction=orientation,
+                                       outboard_meters=thruster_position,
+                                       throttle_ratio=self.rotational_throttle_ratio,
+                                       offset_pixels=location, scale_factor=0.12)
+
     def draw(self, camera_position):
         rotated_image = pygame.transform.rotozoom(self.image, self.position_angular,
                                                   settings.scale_factor)
@@ -150,19 +169,19 @@ class Ship(object):
 
 class Pegasus(Ship):
     SCALE_FACTOR = 0.6
-    DRY_MASS = 1000.0                   # kg
-    LENGTH = 2.5                        # m
-    ROTATE_THRUSTER_POSITION = 2.0      # m outboard from center of mass
-    PRIMARY_BURN_RATE = 4.0             # kg/sec
-    PRIMARY_TANK_MASS = 10              # kg
-    PRIMARY_TANK_VOLUME = 200           # L
+    DRY_MASS = 1000.0  # kg
+    LENGTH = 2.5  # m
+    ROTATE_THRUSTER_POSITION = 2.0  # m outboard from center of mass
+    PRIMARY_BURN_RATE = 4.0  # kg/sec
+    PRIMARY_TANK_MASS = 10  # kg
+    PRIMARY_TANK_VOLUME = 200  # L
 
     PARAMETER_LIMITS = {
         "rotational_burn_rate": (0.15, 1.0)
     }
 
-    def __init__(self, panel, primary_fuel_volume, rotational_burn_rate):
-        super().__init__(panel, "images/A5.png")
+    def __init__(self, primary_fuel_volume, rotational_burn_rate, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.primary_burn_rate = self.PRIMARY_BURN_RATE
         self.rotational_burn_rate = clamp(rotational_burn_rate,
                                           self.PARAMETER_LIMITS["rotational_burn_rate"])
@@ -184,8 +203,8 @@ class Pegasus(Ship):
         }
 
     @classmethod
-    def from_dict(cls, panel, dict_):
-        return cls(panel, dict_["primary_fuel_volume"], dict_["rotational_burn_rate"])
+    def from_dict(cls, dict_):
+        return cls(dict_["primary_fuel_volume"], dict_["rotational_burn_rate"])
 
     def _handle_keyboard_input(self):
         pressed_keys = pygame.key.get_pressed()
@@ -201,6 +220,15 @@ class Pegasus(Ship):
         self.engines["left_aft"].update(right and not empty)
         burn_mass = sum([engine_.fuel_burn for engine_ in self.engines.values()])
         self.fuel_tanks["primary"].update(burn_mass)
+
+
+class PegasusSprite(Pegasus, ShipSprite):
+    def __init__(self, panel, *args, **kwargs):
+        super().__init__(*args, **kwargs, panel=panel, image_filename="images/A5.png")
+
+    @classmethod
+    def from_dict(cls, panel, dict_):
+        return cls(panel, dict_["primary_fuel_volume"], dict_["rotational_burn_rate"])
 
 
 class Manticore(Ship):
@@ -224,15 +252,16 @@ class Manticore(Ship):
         "Medium": {"mass": 40, "volume": 500}
     }
 
-    def __init__(self, panel, primary_fuel_volume, secondary_fuel_volume, primary_fuel_tank_size,
-                 rotational_burn_rate, rotational_throttle_ratio):
-        super().__init__(panel, "images/A6.png")
+    def __init__(self, primary_fuel_volume, secondary_fuel_volume, primary_fuel_tank_size,
+                 rotational_burn_rate, rotational_throttle_ratio, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
         self.primary_burn_rate = self.PRIMARY_BURN_RATE
         self.rotational_burn_rate = clamp(rotational_burn_rate,
                                           self.PARAMETER_LIMITS["rotational_burn_rate"])
         self.rotational_throttle_ratio = clamp(rotational_throttle_ratio,
                                                self.PARAMETER_LIMITS["rotational_throttle_ratio"])
-        primary_fuel_tank_size = primary_fuel_tank_size  \
+        primary_fuel_tank_size = primary_fuel_tank_size \
             if primary_fuel_tank_size in self.FUEL_TANK_OPTIONS.keys() else "Medium"
 
         primary_tank_mass = self.FUEL_TANK_OPTIONS[primary_fuel_tank_size]["mass"]
@@ -255,8 +284,8 @@ class Manticore(Ship):
         }
 
     @classmethod
-    def from_dict(cls, panel, dict_):
-        return cls(panel, dict_["primary_fuel_volume"], dict_["secondary_fuel_volume"],
+    def from_dict(cls, dict_):
+        return cls(dict_["primary_fuel_volume"], dict_["secondary_fuel_volume"],
                    dict_["primary_fuel_tank_size"], dict_["rotational_burn_rate"],
                    dict_["rotational_throttle_ratio"])
 
@@ -281,6 +310,17 @@ class Manticore(Ship):
         self.fuel_tanks["secondary"].update(secondary_burn_mass)
 
 
+class ManticoreSprite(Manticore, ShipSprite):
+    def __init__(self, panel, *args, **kwargs):
+        super().__init__(*args, **kwargs, panel=panel, image_filename="images/A6.png")
+
+    @classmethod
+    def from_dict(cls, panel, dict_):
+        return cls(panel, dict_["primary_fuel_volume"], dict_["secondary_fuel_volume"],
+                   dict_["primary_fuel_tank_size"], dict_["rotational_burn_rate"],
+                   dict_["rotational_throttle_ratio"])
+
+
 class Dragon(Ship):
     SCALE_FACTOR = 0.6
     DRY_MASS = 2100.0  # kg
@@ -298,9 +338,9 @@ class Dragon(Ship):
         "primary_fuel_type": ["HydroFlouro", "Kerolox"]
     }
 
-    def __init__(self, panel, primary_fuel_volume, secondary_fuel_volume, primary_fuel_type,
-                 rotational_burn_rate, rotational_throttle_ratio):
-        super().__init__(panel, "images/A7.png")
+    def __init__(self, primary_fuel_volume, secondary_fuel_volume, primary_fuel_type,
+                 rotational_burn_rate, rotational_throttle_ratio, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.primary_burn_rate = self.PRIMARY_BURN_RATE
         self.rotational_burn_rate = clamp(rotational_burn_rate,
                                           self.PARAMETER_LIMITS["rotational_burn_rate"])
@@ -327,8 +367,8 @@ class Dragon(Ship):
         }
 
     @classmethod
-    def from_dict(cls, panel, dict_):
-        return cls(panel, dict_["primary_fuel_volume"], dict_["secondary_fuel_volume"],
+    def from_dict(cls, dict_):
+        return cls(dict_["primary_fuel_volume"], dict_["secondary_fuel_volume"],
                    dict_["primary_fuel_type"], dict_["rotational_burn_rate"],
                    dict_["rotational_throttle_ratio"])
 
@@ -360,6 +400,17 @@ class Dragon(Ship):
         self.fuel_tanks["secondary"].update(secondary_burn_mass)
 
 
+class DragonSprite(Dragon, ShipSprite):
+    def __init__(self, panel, *args, **kwargs):
+        super().__init__(*args, **kwargs, panel=panel, image_filename="images/A7.png")
+
+    @classmethod
+    def from_dict(cls, panel, dict_):
+        return cls(panel, dict_["primary_fuel_volume"], dict_["secondary_fuel_volume"],
+                   dict_["primary_fuel_type"], dict_["rotational_burn_rate"],
+                   dict_["rotational_throttle_ratio"])
+
+
 class Phoenix(Ship):
     SCALE_FACTOR = 0.7
     DRY_MASS = 1500.0               # kg
@@ -378,9 +429,9 @@ class Phoenix(Ship):
         "nose_burn_rate": (1.0, 10.0)
     }
 
-    def __init__(self, panel, primary_fuel_volume, secondary_fuel_volume, primary_fuel_type,
-                 rotational_burn_rate, rotational_throttle_ratio, nose_burn_rate):
-        super().__init__(panel, "images/A10.png")
+    def __init__(self, primary_fuel_volume, secondary_fuel_volume, primary_fuel_type,
+                 rotational_burn_rate, rotational_throttle_ratio, nose_burn_rate, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.primary_burn_rate = self.PRIMARY_BURN_RATE
         self.nose_burn_rate = nose_burn_rate
         self.rotational_burn_rate = clamp(rotational_burn_rate,
@@ -411,8 +462,8 @@ class Phoenix(Ship):
         }
 
     @classmethod
-    def from_dict(cls, panel, dict_):
-        return cls(panel, dict_["primary_fuel_volume"], dict_["secondary_fuel_volume"],
+    def from_dict(cls, dict_):
+        return cls(dict_["primary_fuel_volume"], dict_["secondary_fuel_volume"],
                    dict_["primary_fuel_type"], dict_["rotational_burn_rate"],
                    dict_["rotational_throttle_ratio"], dict_["nose_burn_rate"])
 
@@ -444,3 +495,14 @@ class Phoenix(Ship):
         secondary_burn_mass = sum([engine_.fuel_burn for name, engine_ in self.engines.items()
                                    if name != "main"])
         self.fuel_tanks["secondary"].update(secondary_burn_mass)
+
+
+class PhoenixSprite(Phoenix, ShipSprite):
+    def __init__(self, panel, *args, **kwargs):
+        super().__init__(*args, **kwargs, panel=panel, image_filename="images/A10.png")
+
+    @classmethod
+    def from_dict(cls, panel, dict_):
+        return cls(panel, dict_["primary_fuel_volume"], dict_["secondary_fuel_volume"],
+                   dict_["primary_fuel_type"], dict_["rotational_burn_rate"],
+                   dict_["rotational_throttle_ratio"], dict_["nose_burn_rate"])
