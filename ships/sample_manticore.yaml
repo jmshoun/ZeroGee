@@ -1,4 +1,5 @@
 ship_class: "Manticore"
+primary_fuel_tank_size: "Medium"
 primary_fuel_volume: 200
 secondary_fuel_volume: 14
 rotational_burn_rate: 0.5

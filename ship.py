@@ -91,6 +91,11 @@ class Ship(object):
         return self.DRY_MASS + fuel_tank_mass
 
     @property
+    def dry_mass(self):
+        fuel_tank_dry_mass = sum([tank.dry_mass for tank in self.fuel_tanks])
+        return self.DRY_MASS + fuel_tank_dry_mass
+
+    @property
     def force(self):
         total_force = Vector2(0, 0)
         for engine_ in self.engines.values():
@@ -100,6 +105,16 @@ class Ship(object):
     @property
     def torque(self):
         return sum([engine_.torque for engine_ in self.engines.values()])
+
+    def rotational_engine(self, location, orientation):
+        rotational_fuel_tank = self.fuel_tanks["secondary"]  \
+            if "secondary" in self.fuel_tanks.keys() else self.fuel_tanks["primary"]
+        thruster_position = self.ROTATE_THRUSTER_POSITION * (1 if location.x > 0 else -1)
+        return propulsion.EngineSprite(self.panel, fuel_rate=self.rotational_burn_rate,
+                                       fuel_tank=rotational_fuel_tank, direction=orientation,
+                                       outboard_meters=thruster_position,
+                                       throttle_ratio=self.rotational_throttle_ratio,
+                                       offset_pixels=location, scale_factor=0.12)
 
     def update(self, external_acceleration):
         self._handle_keyboard_input()
@@ -151,26 +166,21 @@ class Pegasus(Ship):
         self.primary_burn_rate = self.PRIMARY_BURN_RATE
         self.rotational_burn_rate = clamp(rotational_burn_rate,
                                           self.PARAMETER_LIMITS["rotational_burn_rate"])
+        self.rotational_throttle_ratio = 1.0
 
         self.fuel_tanks = {
             "primary": propulsion.FuelTank(self.PRIMARY_TANK_MASS, self.PRIMARY_TANK_VOLUME,
                                            fuel_volume=primary_fuel_volume)
         }
 
-        def rotational_engine(location, orientation):
-            thruster_position = self.ROTATE_THRUSTER_POSITION * (1 if location.x > 0 else -1)
-            return propulsion.Engine(self.panel, self.rotational_burn_rate,
-                                     self.fuel_tanks["primary"], location, 0.12, orientation,
-                                     thruster_position)
-
         self.engines = {
-            "main": propulsion.Engine(self.panel, self.primary_burn_rate,
-                                      self.fuel_tanks["primary"], Vector2(-35, 0), 0.4,
-                                      direction=0),
-            "left_fore": rotational_engine(Vector2(15, 10), 90),
-            "left_aft": rotational_engine(Vector2(-15, 35), 90),
-            "right_fore": rotational_engine(Vector2(15, -10), -90),
-            "right_aft": rotational_engine(Vector2(-15, -35), -90)
+            "main": propulsion.EngineSprite(self.panel, fuel_rate=self.primary_burn_rate,
+                                            fuel_tank=self.fuel_tanks["primary"], direction=0,
+                                            offset_pixels=Vector2(-35, 0), scale_factor=0.4),
+            "left_fore": self.rotational_engine(Vector2(15, 10), 90),
+            "left_aft": self.rotational_engine(Vector2(-15, 35), 90),
+            "right_fore": self.rotational_engine(Vector2(15, -10), -90),
+            "right_aft": self.rotational_engine(Vector2(-15, -35), -90)
         }
 
     @classmethod
@@ -234,20 +244,14 @@ class Manticore(Ship):
                                              fuel_volume=secondary_fuel_volume)
         }
 
-        def rotational_engine(location, orientation):
-            thruster_position = self.ROTATE_THRUSTER_POSITION * (1 if location.x > 0 else -1)
-            return propulsion.Engine(self.panel, self.rotational_burn_rate,
-                                     self.fuel_tanks["secondary"], location, 0.12, orientation,
-                                     thruster_position, self.rotational_throttle_ratio)
-
         self.engines = {
-            "main": propulsion.Engine(self.panel, self.primary_burn_rate,
-                                      self.fuel_tanks["primary"], Vector2(-45, 0), 0.4,
-                                      direction=0),
-            "left_fore": rotational_engine(Vector2(18, 13), 90),
-            "left_aft": rotational_engine(Vector2(-15, 25), 90),
-            "right_fore": rotational_engine(Vector2(18, -13), -90),
-            "right_aft": rotational_engine(Vector2(-15, -25), -90)
+            "main": propulsion.EngineSprite(self.panel, fuel_rate=self.primary_burn_rate,
+                                            fuel_tank=self.fuel_tanks["primary"], direction=0,
+                                            offset_pixels=Vector2(-45, 0), scale_factor=0.4),
+            "left_fore": self.rotational_engine(Vector2(18, 13), 90),
+            "left_aft": self.rotational_engine(Vector2(-15, 25), 90),
+            "right_fore": self.rotational_engine(Vector2(18, -13), -90),
+            "right_aft": self.rotational_engine(Vector2(-15, -25), -90)
         }
 
     @classmethod
@@ -312,20 +316,14 @@ class Dragon(Ship):
                                              fuel_volume=secondary_fuel_volume)
         }
 
-        def rotational_engine(location, orientation):
-            thruster_position = self.ROTATE_THRUSTER_POSITION * (1 if location.x > 0 else -1)
-            return propulsion.Engine(self.panel, self.rotational_burn_rate,
-                                     self.fuel_tanks["secondary"], location, 0.12, orientation,
-                                     thruster_position, self.rotational_throttle_ratio)
-
         self.engines = {
-            "main": propulsion.Engine(self.panel, self.primary_burn_rate,
-                                      self.fuel_tanks["primary"], Vector2(-45, 0), 0.4,
-                                      direction=0),
-            "left_fore": rotational_engine(Vector2(15, 26), 90),
-            "left_aft": rotational_engine(Vector2(-20, 32), 90),
-            "right_fore": rotational_engine(Vector2(15, -26), -90),
-            "right_aft": rotational_engine(Vector2(-20, -32), -90)
+            "main": propulsion.EngineSprite(self.panel, fuel_rate=self.primary_burn_rate,
+                                            fuel_tank=self.fuel_tanks["primary"], direction=0,
+                                            offset_pixels=Vector2(-45, 0), scale_factor=.4),
+            "left_fore": self.rotational_engine(Vector2(15, 26), 90),
+            "left_aft": self.rotational_engine(Vector2(-20, 32), 90),
+            "right_fore": self.rotational_engine(Vector2(15, -26), -90),
+            "right_aft": self.rotational_engine(Vector2(-20, -32), -90)
         }
 
     @classmethod
@@ -399,23 +397,17 @@ class Phoenix(Ship):
                                              fuel_volume=secondary_fuel_volume)
         }
 
-        def rotational_engine(location, orientation):
-            thruster_position = self.ROTATE_THRUSTER_POSITION * (1 if location.x > 0 else -1)
-            return propulsion.Engine(self.panel, self.rotational_burn_rate,
-                                     self.fuel_tanks["secondary"], location, 0.12, orientation,
-                                     thruster_position, self.rotational_throttle_ratio)
-
         self.engines = {
-            "main": propulsion.Engine(self.panel, self.primary_burn_rate,
-                                      self.fuel_tanks["primary"], Vector2(-40, 0), 0.4,
-                                      direction=0),
-            "nose": propulsion.Engine(self.panel, self.nose_burn_rate,
-                                      self.fuel_tanks["secondary"], Vector2(40, 0), 0.25,
-                                      direction=180),
-            "left_fore": rotational_engine(Vector2(20, 12), 90),
-            "left_aft": rotational_engine(Vector2(-20, 32), 90),
-            "right_fore": rotational_engine(Vector2(20, -12), -90),
-            "right_aft": rotational_engine(Vector2(-20, -32), -90)
+            "main": propulsion.EngineSprite(self.panel, fuel_rate=self.primary_burn_rate,
+                                            fuel_tank=self.fuel_tanks["primary"], direction=0,
+                                            offset_pixels=Vector2(-40, 0), scale_factor=0.4),
+            "nose": propulsion.EngineSprite(self.panel, fuel_rate=self.nose_burn_rate,
+                                            fuel_tank=self.fuel_tanks["secondary"], direction=180,
+                                            offset_pixels=Vector2(40, 0), scale_factor=0.25),
+            "left_fore": self.rotational_engine(Vector2(20, 12), 90),
+            "left_aft": self.rotational_engine(Vector2(-20, 32), 90),
+            "right_fore": self.rotational_engine(Vector2(20, -12), -90),
+            "right_aft": self.rotational_engine(Vector2(-20, -32), -90)
         }
 
     @classmethod
