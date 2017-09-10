@@ -55,7 +55,7 @@ class Level(object):
         self.hud_panel = Panel(screen.subsurface(pygame.Rect(*panel_sizes["hud_rect"])))
         self.minimap_panel = Panel(screen.subsurface(pygame.Rect(*panel_sizes["minimap_rect"])))
         
-        self.ship = ship.ship_from_dict(self.main_panel.surface, ship_dict)
+        self.ship = ship.ship_from_dict(ship_dict, self.main_panel.surface)
         self.ship.set_position((-0.1, 0), 0)
         self.course = course.Course(self.main_panel.surface, course_dict)
         self.active_splits = waypoint.Splits(self.course.num_waypoints)

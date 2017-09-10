@@ -21,18 +21,17 @@ def clamp(x, clamp_range):
     return clamp_min if x < clamp_min else clamp_max if x > clamp_max else x
 
 
-def ship_from_dict(panel, dict_):
+def ship_from_dict(dict_, panel=None):
     ship_type = dict_["ship_class"]
-    if ship_type == "Pegasus":
-        return PegasusSprite.from_dict(panel, dict_)
-    elif ship_type == "Manticore":
-        return ManticoreSprite.from_dict(panel, dict_)
-    elif ship_type == "Dragon":
-        return DragonSprite.from_dict(panel, dict_)
-    elif ship_type == "Phoenix":
-        return PhoenixSprite.from_dict(panel, dict_)
-    else:
+    if ship_type not in ["Pegasus", "Manticore", "Dragon", "Phoenix"]:
         raise Exception("Ship type {} does not exist.".format(ship_type))
+    if panel:
+        ship_type += "Sprite"
+    class_object = globals()[ship_type]
+    if panel:
+        return class_object.from_dict(panel, dict_)
+    else:
+        return class_object.from_dict(dict_)
 
 
 class Ship(object):
