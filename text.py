@@ -12,9 +12,11 @@ FONT_SIZE_LOOKUP = {
 reference_font_size = FONT_SIZE_LOOKUP[settings.screen_resolution]
 
 TOP_LEFT = (0, 0)
+TOP = (0.5, 0.0)
 CENTER = (0.5, 0.5)
 BOTTOM = (0.5, 1.0)
 RIGHT = (1.0, 0.5)
+LEFT = (0.0, 0.5)
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
